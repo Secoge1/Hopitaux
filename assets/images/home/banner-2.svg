@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Consultations médicales">
+  <defs>
+    <linearGradient id="g2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5b67d8"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#g2)"/>
+  <ellipse cx="400" cy="300" rx="350" ry="250" fill="#fff" opacity="0.07"/>
+  <ellipse cx="1500" cy="780" rx="420" ry="300" fill="#fff" opacity="0.06"/>
+  <g transform="translate(960 520)" opacity="0.14">
+    <circle cx="0" cy="0" r="100" fill="none" stroke="#fff" stroke-width="8"/>
+    <path d="M-55 0 H55 M0 -55 V55" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -87,6 +87,26 @@ strpos($api, 'bindApiUserContext') !== false
     ? bsok('API REST — contexte tenant utilisateur')
     : bsfail('API REST — bindApiUserContext manquant');
 
+$publicChecks = [
+    ['home.php', 'public_payment_sync_spotlight', 'Accueil — bandeau sync'],
+    ['documentation.php', 'sync-paiements', 'Documentation — section sync'],
+    ['documentation.php', 'features-plateforme', 'Documentation — catalogue features'],
+    ['includes/documentation_sections.php', 'doc_payment_sync_public', 'Contenu sync public'],
+    ['includes/public_layout.php', 'pub-feature-badge', 'Styles badge public'],
+    ['login.php', 'Sync automatique paiements', 'Login — slide finances'],
+    ['includes/saas/SubscriptionPlan.php', 'Sync automatique paiements', 'Tarifs marketing sync'],
+];
+
+foreach ($publicChecks as [$file, $needle, $label]) {
+    $c = is_file("$base/$file") ? file_get_contents("$base/$file") : '';
+    strpos($c, $needle) !== false ? bsok($label) : bsfail("$label ($file)");
+}
+
+$whitelist = is_file("$base/includes/saas/saas_helpers.php") ? file_get_contents("$base/includes/saas/saas_helpers.php") : '';
+strpos($whitelist, "'documentation.php'") !== false
+    ? bsok('documentation.php en whitelist SaaS')
+    : bsfail('documentation.php absent de la whitelist SaaS');
+
 echo "\n--- Conditions d'affichage WEB / APP ---\n";
 echo "1. Feature payment_finance_sync activée (Admin plateforme)\n";
 echo "2. WEB : page module paiements | consultations | laboratoire | finances\n";

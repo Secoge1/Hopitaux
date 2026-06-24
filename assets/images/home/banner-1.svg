@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Gestion clinique">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c51bf"/>
+      <stop offset="50%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="70%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#g1)"/>
+  <rect width="1920" height="1080" fill="url(#glow1)"/>
+  <circle cx="1600" cy="200" r="280" fill="#fff" opacity="0.06"/>
+  <circle cx="300" cy="850" r="220" fill="#fff" opacity="0.05"/>
+  <g transform="translate(960 540)" opacity="0.12">
+    <rect x="-80" y="-120" width="160" height="200" rx="16" fill="#fff"/>
+    <rect x="-30" y="-60" width="60" height="120" rx="4" fill="#667eea"/>
+    <rect x="-60" y="-30" width="120" height="60" rx="4" fill="#667eea"/>
+  </g>
+</svg>

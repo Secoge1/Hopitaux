@@ -1,0 +1,127 @@
+/* Efficasante SaaS — pages tarifs / souscription */
+
+.saas-pricing-page,
+.saas-subscribe-page,
+.saas-payment-page,
+.saas-renew-page {
+    background: linear-gradient(160deg, #f0f4ff 0%, #fafbff 100%);
+    min-height: 100vh;
+}
+
+.saas-hero {
+    background: linear-gradient(135deg, #1b4f9b 0%, #1b8fad 50%, #00b5ad 100%);
+}
+
+.saas-plan-card {
+    border-radius: 16px;
+    border: 2px solid #e9ecef;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.saas-plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
+.saas-plan-popular {
+    border-color: #1b8fad;
+    box-shadow: 0 8px 30px rgba(27, 143, 173, 0.2);
+}
+
+.saas-badge {
+    position: absolute;
+    top: 12px;
+    right: -32px;
+    background: #1b8fad;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 4px 40px;
+    transform: rotate(45deg);
+    letter-spacing: 0.5px;
+}
+
+.saas-price {
+    color: #1b4f9b;
+}
+
+.saas-price-amount {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.saas-price-annual {
+    white-space: nowrap;
+}
+
+.saas-price-annual .saas-price-amount {
+    display: inline;
+}
+
+.saas-price-period {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #6c757d;
+}
+
+.saas-price-annual .saas-price-period {
+    white-space: nowrap;
+}
+
+.saas-price-period-below {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.88rem;
+}
+
+.saas-features li {
+    padding: 0.35rem 0;
+    font-size: 0.92rem;
+}
+
+.saas-features li.no {
+    opacity: 0.5;
+}
+
+.saas-amount-box {
+    background: linear-gradient(135deg, #f8f9ff, #fff);
+    border: 1.5px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.saas-amount-display {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1b4f9b;
+}
+
+.saas-phone-box {
+    background: linear-gradient(135deg, #1b4f9b, #1b8fad);
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+.saas-phone-link {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.saas-phone-link:hover {
+    color: #e0e7ff;
+}
+
+.saas-steps {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.saas-steps li {
+    margin-bottom: 0.5rem;
+}

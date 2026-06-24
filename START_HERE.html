@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORRECTION RAPIDE - 3 clics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .main-card {
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            color: #667eea;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .step {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            border: 3px solid;
+            transition: all 0.3s;
+        }
+        .step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .step-1 { border-color: #17a2b8; }
+        .step-1 .step-number { background: #17a2b8; }
+        .step-2 { border-color: #ffc107; }
+        .step-2 .step-number { background: #ffc107; color: #000; }
+        .step-3 { border-color: #28a745; }
+        .step-3 .step-number { background: #28a745; }
+        .big-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            border: none;
+            margin-top: 20px;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+        .big-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .badge-xl {
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <h1><i class="fas fa-bolt me-3"></i>3 CLICS</h1>
+        <div class="text-center mb-4">
+            <span class="badge badge-xl bg-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>3 ANOMALIES DÉTECTÉES
+            </span>
+        </div>
+        
+        <!-- Étape 1 -->
+        <div class="step step-1">
+            <div class="step-number">1</div>
+            <h2 style="margin-left: 50px; color: #17a2b8;">
+                <i class="fas fa-vial me-2"></i>Tester
+            </h2>
+            <p class="fs-5 mb-0" style="margin-left: 50px;">Vérifier l'état du système</p>
+            <a href="test_corrections.php" class="big-button btn btn-info" target="_blank">
+                <i class="fas fa-play-circle me-2"></i>LANCER LES TESTS
+            </a>
+        </div>
+        
+        <!-- Étape 2 -->
+        <div class="step step-2">
+            <div class="step-number">2</div>
+            <h2 style="margin-left: 50px; color: #ffc107;">
+                <i class="fas fa-tools me-2"></i>Corriger
+            </h2>
+            <p class="fs-5 mb-0" style="margin-left: 50px;">Exécuter le script de correction automatique</p>
+            <a href="config/fix_database_enums.php" class="big-button btn btn-warning" target="_blank">
+                <i class="fas fa-magic me-2"></i>CORRIGER AUTOMATIQUEMENT
+            </a>
+        </div>
+        
+        <!-- Étape 3 -->
+        <div class="step step-3">
+            <div class="step-number">3</div>
+            <h2 style="margin-left: 50px; color: #28a745;">
+                <i class="fas fa-check-double me-2"></i>Vérifier
+            </h2>
+            <p class="fs-5 mb-0" style="margin-left: 50px;">Retourner au dashboard et vérifier les compteurs</p>
+            <a href="dashboard.php" class="big-button btn btn-success">
+                <i class="fas fa-tachometer-alt me-2"></i>ALLER AU DASHBOARD
+            </a>
+        </div>
+        
+        <hr class="my-5">
+        
+        <!-- Liens supplémentaires -->
+        <div class="text-center">
+            <h4 class="mb-4"><i class="fas fa-book me-2"></i>Documentation complète</h4>
+            <div class="d-flex justify-content-around flex-wrap">
+                <a href="index_corrections.html" class="btn btn-outline-primary m-2">
+                    <i class="fas fa-list me-2"></i>Index complet
+                </a>
+                <a href="guide_demarrage.html" class="btn btn-outline-info m-2">
+                    <i class="fas fa-rocket me-2"></i>Guide détaillé
+                </a>
+                <a href="corrections_anomalies.html" class="btn btn-outline-secondary m-2">
+                    <i class="fas fa-file-alt me-2"></i>Documentation
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <p class="text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                Temps estimé : <strong>5 minutes</strong>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

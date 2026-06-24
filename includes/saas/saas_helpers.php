@@ -60,7 +60,7 @@ if (!function_exists('saas_is_whitelisted_page')) {
         }
         $whitelist = [
             'renew.php', 'subscribe.php', 'tarifs.php', 'payment_instructions.php',
-            'login.php', 'home.php', 'admin_tenants.php', 'logout.php',
+            'login.php', 'home.php', 'documentation.php', 'admin_tenants.php', 'logout.php',
             'migrate_saas_multitenant.php',
         ];
         return in_array(basename($script), $whitelist, true);

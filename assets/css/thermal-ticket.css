@@ -1,0 +1,440 @@
+/* ============================================================
+   Ticket thermique 80 mm — Xprinter XP-80TS (aperçu + impression)
+   Design unique : monochrome professionnel, typographie claire
+   ============================================================ */
+
+/* --- Variables globales --- */
+:root {
+    --t-width:         80mm;
+    --t-font:          'Courier New', Courier, monospace;
+    --t-bg-page:       #1a1a2e;
+    --t-bg-card:       #ffffff;
+    --t-ink:           #000000;
+    --t-ink-muted:     #555555;
+    --t-ink-light:     #888888;
+    --t-accent:        #000000;
+    --t-line-height:   1.2;
+    --t-radius:        4px;
+    --t-pad-x:         2.5mm;
+    --t-pad-y:         2mm;
+}
+
+/* ============================================================
+   IMPRESSION @page
+   ============================================================ */
+@page {
+    size: var(--thermal-width-mm, 80mm) auto;
+    margin: 0;
+}
+
+@media print {
+    html,
+    body.thermal-body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: var(--thermal-width-mm, 80mm) !important;
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    .no-print,
+    .thermal-controls,
+    .thermal-controls-wrapper {
+        display: none !important;
+    }
+
+    .thermal-page {
+        width: var(--thermal-width-mm, 80mm) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .thermal-receipt {
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: var(--t-pad-y) var(--t-pad-x) !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    .thermal-receipt > *:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+/* ============================================================
+   CORPS DE PAGE (aperçu écran)
+   ============================================================ */
+body.thermal-body {
+    font-family: var(--t-font);
+    background: var(--t-bg-page);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(0,180,216,.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0,119,182,.08) 0%, transparent 50%);
+}
+
+/* ============================================================
+   BARRE DE CONTRÔLES (boutons impression / fermer)
+   ============================================================ */
+.thermal-controls-wrapper {
+    width: var(--t-width);
+    max-width: var(--t-width);
+    padding: 14px 0 10px;
+}
+
+.thermal-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.btn-thermal {
+    border: none;
+    padding: 9px 10px;
+    border-radius: var(--t-radius);
+    cursor: pointer;
+    font-size: 11px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    width: 100%;
+    text-align: center;
+    transition: opacity .15s, transform .1s;
+}
+.btn-thermal:active { transform: scale(.97); }
+
+.btn-thermal--primary {
+    background: #0077b6;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,119,182,.45);
+}
+.btn-thermal--primary:hover { opacity: .88; }
+
+.btn-thermal--dark {
+    background: #023e8a;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(2,62,138,.45);
+}
+.btn-thermal--dark:hover { opacity: .88; }
+
+.btn-thermal--close {
+    background: rgba(255,255,255,.12);
+    color: #cdd6f4;
+    border: 1px solid rgba(255,255,255,.18);
+}
+.btn-thermal--close:hover { background: rgba(255,255,255,.2); }
+
+.thermal-hint {
+    font-size: 10px;
+    color: #90a4ae;
+    text-align: center;
+    padding: 4px 0;
+    font-family: system-ui, sans-serif;
+}
+
+/* ============================================================
+   PAGE (conteneur ticket)
+   ============================================================ */
+.thermal-page {
+    width: var(--t-width);
+    max-width: var(--t-width);
+    flex: 0 0 auto;
+    padding-bottom: 28px;
+}
+
+/* ============================================================
+   REÇU (le ticket lui-même)
+   ============================================================ */
+.thermal-receipt {
+    width: 100%;
+    background: var(--t-bg-card);
+    color: var(--t-ink);
+    font-family: var(--t-font);
+    font-size: 11.5px;
+    line-height: var(--t-line-height);
+    padding: var(--t-pad-y) var(--t-pad-x) 3mm;
+    word-break: break-word;
+    position: relative;
+}
+
+/* Découpe dentée en haut */
+.thermal-receipt::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 6px;
+    background:
+        radial-gradient(circle at 50% 100%, var(--t-bg-page) 4px, transparent 4px) 0 0 / 12px 6px repeat-x,
+        var(--t-bg-card);
+    margin-bottom: 6px;
+    /* visible uniquement à l'écran, supprimé à l'impression */
+}
+
+@media print {
+    .thermal-receipt::before {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   EN-TÊTE : logo + nom établissement
+   ============================================================ */
+.thermal-header {
+    text-align: center;
+    padding-bottom: 3px;
+}
+
+.thermal-logo {
+    text-align: center;
+    margin: 0 0 4px;
+    line-height: 0;
+}
+
+.thermal-logo img {
+    display: block;
+    max-width: 50mm;
+    max-height: 12mm;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+/* Nom clinique */
+.thermal-clinic-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.2;
+    margin: 2px 0 1px;
+}
+
+.thermal-clinic-tel {
+    font-size: 10px;
+    text-align: center;
+    color: var(--t-ink-muted);
+    margin: 0 0 3px;
+}
+
+/* ============================================================
+   BANDEAU TITRE TICKET
+   ============================================================ */
+.thermal-title-band {
+    background: var(--t-ink);
+    color: #fff;
+    text-align: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 0;
+    margin: 3px 0 2px;
+}
+
+/* ============================================================
+   NUMÉRO DE TICKET
+   ============================================================ */
+.thermal-ticket-no-block {
+    text-align: center;
+    margin: 1px 0 2px;
+}
+
+.thermal-ticket-no {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.1;
+}
+
+.thermal-ticket-date-small {
+    font-size: 9.5px;
+    color: var(--t-ink-muted);
+    margin-top: 1px;
+}
+
+/* ============================================================
+   SÉPARATEURS
+   ============================================================ */
+.thermal-sep {
+    border: none;
+    border-top: 1px dashed #000;
+    margin: 3px 0;
+}
+
+.thermal-sep--solid {
+    border-top: 2px solid #000;
+    margin: 3px 0;
+}
+
+/* Séparateur zigzag (ASCII art) */
+.thermal-sep--wave {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0px;
+    color: var(--t-ink-muted);
+    margin: 4px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1;
+}
+
+/* ============================================================
+   LIGNES D'INFORMATION
+   ============================================================ */
+.thermal-info-block {
+    margin: 4px 0;
+}
+
+.thermal-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 11px;
+    margin: 2px 0;
+    line-height: 1.3;
+}
+
+.thermal-line-label {
+    color: var(--t-ink-muted);
+    flex-shrink: 0;
+    font-size: 10.5px;
+}
+
+.thermal-line-value {
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+}
+
+/* Ligne pleine largeur (motif/symptômes) */
+.thermal-line--full {
+    display: block;
+    font-size: 10.5px;
+    color: var(--t-ink-muted);
+    margin: 1px 0 2px;
+    padding-left: 2mm;
+    border-left: 2px solid #ddd;
+    line-height: 1.35;
+}
+
+/* ============================================================
+   BLOC PRIX
+   ============================================================ */
+.thermal-price-block {
+    margin: 4px 0;
+}
+
+.thermal-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 11px;
+    margin: 2px 0;
+}
+
+.thermal-price-row__label {
+    color: var(--t-ink-muted);
+    font-size: 10.5px;
+}
+
+.thermal-price-row__amount {
+    font-weight: 600;
+}
+
+/* ============================================================
+   TOTAL À PAYER
+   ============================================================ */
+.thermal-total-block {
+    text-align: center;
+    margin: 3px 0 2px;
+}
+
+.thermal-total-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--t-ink-muted);
+    margin-bottom: 1px;
+}
+
+.thermal-total-amount {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+/* ============================================================
+   MESSAGE CAISSE
+   ============================================================ */
+.thermal-message-block {
+    text-align: center;
+    margin: 5px 0 3px;
+}
+
+.thermal-message {
+    font-size: 10px;
+    color: var(--t-ink-muted);
+    line-height: 1.4;
+}
+
+.thermal-message strong {
+    font-size: 11px;
+    color: var(--t-ink);
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1px;
+}
+
+/* ============================================================
+   PIED DE TICKET
+   ============================================================ */
+.thermal-footer {
+    text-align: center;
+    font-size: 9.5px;
+    color: var(--t-ink-light);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.thermal-footer .thermal-consult-ref {
+    font-size: 9px;
+    color: #aaa;
+    margin-top: 2px;
+    display: block;
+}
+
+/* ============================================================
+   RESPONSIVE PETIT ÉCRAN
+   ============================================================ */
+@media (max-width: 360px) {
+    body.thermal-body {
+        padding: 0;
+    }
+
+    .thermal-controls-wrapper,
+    .thermal-page {
+        width: min(var(--t-width), calc(100vw - 8px));
+        max-width: min(var(--t-width), calc(100vw - 8px));
+    }
+}

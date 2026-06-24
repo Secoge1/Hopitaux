@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1976D2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Efficasante - Diagnostic Dermatologique IA</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- TensorFlow.js pour l'extraction de features -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1976D2;
+            --primary-dark: #1565C0;
+            --success-color: #2E7D32;
+            --warning-color: #F57C00;
+            --danger-color: #C62828;
+            --info-color: #0288D1;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .app-header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .app-header p {
+            font-size: 0.85rem;
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+        
+        /* AI Status Banner */
+        .ai-status-banner {
+            padding: 12px 15px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-status-banner.loading {
+            background: #e3f2fd;
+            color: #1565C0;
+        }
+        
+        .ai-status-banner.ready {
+            background: #e8f5e9;
+            color: #2E7D32;
+        }
+        
+        .ai-status-banner.error {
+            background: #ffebee;
+            color: #C62828;
+        }
+        
+        .ai-status-banner .spinner-border {
+            width: 18px;
+            height: 18px;
+            border-width: 2px;
+        }
+        
+        .progress-bar-custom {
+            height: 3px;
+            background: #e0e0e0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar-custom .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            padding: 15px;
+        }
+        
+        /* Cards */
+        .diagnostic-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .diagnostic-card:active {
+            transform: scale(0.98);
+        }
+        
+        .diagnostic-card.clickable {
+            cursor: pointer;
+        }
+        
+        .diagnostic-card.clickable:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .diagnostic-card.primary {
+            background: linear-gradient(135deg, var(--success-color) 0%, #43A047 100%);
+            color: white;
+        }
+        
+        .diagnostic-card.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .card-icon.green {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .card-content h3 {
+            font-size: 1.1rem;
+            margin: 0 0 4px;
+            font-weight: 600;
+        }
+        
+        .card-content p {
+            font-size: 0.85rem;
+            margin: 0;
+            opacity: 0.85;
+        }
+        
+        /* Warning Box */
+        .warning-box {
+            background: #fff8e1;
+            border-left: 4px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px;
+            font-size: 0.85rem;
+            color: #5D4037;
+        }
+        
+        .warning-box i {
+            color: var(--warning-color);
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--info-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px;
+            font-size: 0.85rem;
+            color: #01579B;
+        }
+        
+        /* Camera Section */
+        .camera-container {
+            position: relative;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 15px;
+            aspect-ratio: 4/3;
+        }
+        
+        #camera-preview, #captured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+            pointer-events: none;
+        }
+        
+        .camera-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            aspect-ratio: 1;
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 50%;
+        }
+        
+        .camera-hint {
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            pointer-events: auto;
+        }
+        
+        .btn-capture {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-capture:active {
+            transform: scale(0.9);
+        }
+        
+        .btn-capture-inner {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-camera-action {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-action {
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-action.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-action.success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-action.secondary {
+            background: #e0e0e0;
+            color: #424242;
+        }
+        
+        .btn-action:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        
+        /* Analysis Screen */
+        .analysis-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 60vh;
+        }
+        
+        .analysis-animation {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .analysis-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .analysis-ring:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: var(--success-color);
+            animation-duration: 0.8s;
+            animation-direction: reverse;
+        }
+        
+        .analysis-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .analysis-text h3 {
+            font-size: 1.2rem;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        
+        .analysis-text p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+        
+        .analysis-steps {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 280px;
+        }
+        
+        .analysis-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .analysis-step.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .analysis-step.done {
+            color: var(--success-color);
+        }
+        
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        .analysis-step.active .step-icon {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .analysis-step.done .step-icon {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        /* Results Screen */
+        .results-header {
+            background: linear-gradient(135deg, var(--success-color) 0%, #43A047 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .results-header h2 {
+            font-size: 1.2rem;
+            margin: 0 0 5px;
+        }
+        
+        .results-header p {
+            font-size: 0.85rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            margin: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .result-card-header {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-card-header i {
+            color: var(--primary-color);
+        }
+        
+        .result-card-header h4 {
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .result-card-body {
+            padding: 15px;
+        }
+        
+        /* Prediction Items */
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .prediction-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .prediction-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .prediction-item:first-child .prediction-rank {
+            background: var(--success-color);
+        }
+        
+        .prediction-info {
+            flex: 1;
+        }
+        
+        .prediction-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+        
+        .prediction-common {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .prediction-confidence {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .confidence-high {
+            background: #e8f5e9;
+            color: var(--success-color);
+        }
+        
+        .confidence-medium {
+            background: #fff8e1;
+            color: var(--warning-color);
+        }
+        
+        .confidence-low {
+            background: #ffebee;
+            color: var(--danger-color);
+        }
+        
+        /* Urgency Banner */
+        .urgency-banner {
+            padding: 15px;
+            margin: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .urgency-banner.high {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .urgency-banner.medium {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+        }
+        
+        .urgency-banner.low {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .urgency-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .urgency-banner.high .urgency-icon {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .urgency-banner.medium .urgency-icon {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .urgency-banner.low .urgency-icon {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .urgency-text h5 {
+            font-size: 0.95rem;
+            margin: 0 0 4px;
+            font-weight: 600;
+        }
+        
+        .urgency-text p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: #555;
+        }
+        
+        /* ABCDE Section */
+        .abcde-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+        
+        .abcde-item {
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 10px;
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .abcde-item.active {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .abcde-item .letter {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .abcde-item .label {
+            font-size: 0.65rem;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        /* Recommendation List */
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .recommendation-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+        
+        .recommendation-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .recommendation-list i {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        /* Image Preview */
+        .result-image-container {
+            position: relative;
+        }
+        
+        .result-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        /* Screen visibility */
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Retry button */
+        .btn-retry {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1><i class="fas fa-microscope me-2"></i>Diagnostic Dermatologique</h1>
+            <p>Analyse IA des lésions cutanées</p>
+        </header>
+        
+        <!-- AI Status Banner -->
+        <div class="ai-status-banner loading" id="ai-status">
+            <div class="spinner-border" role="status"></div>
+            <span>Initialisation du système d'analyse...</span>
+        </div>
+        <div class="progress-bar-custom" id="progress-container">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <!-- Main Screen -->
+        <div class="screen active" id="main-screen">
+            <div class="content-section">
+                <div class="diagnostic-card primary clickable" id="btn-start-diagnostic">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="card-icon green">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Analyser une lésion</h3>
+                            <p>Prenez une photo pour analyse IA</p>
+                        </div>
+                        <i class="fas fa-chevron-right ms-auto"></i>
+                    </div>
+                </div>
+                
+                <div class="diagnostic-card clickable" onclick="showInfo()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="card-icon" style="background: #e3f2fd;">
+                            <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Types de lésions</h3>
+                            <p>7 catégories diagnostiques</p>
+                        </div>
+                        <i class="fas fa-chevron-right ms-auto" style="color: #999;"></i>
+                    </div>
+                </div>
+                
+                <div class="diagnostic-card clickable" onclick="showABCDEInfo()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="card-icon" style="background: #fff8e1;">
+                            <i class="fas fa-spell-check" style="color: var(--warning-color);"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Règle ABCDE</h3>
+                            <p>Auto-évaluation des grains de beauté</p>
+                        </div>
+                        <i class="fas fa-chevron-right ms-auto" style="color: #999;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <i class="fas fa-microscope me-2"></i>
+                <strong>Modèle HAM10000</strong><br>
+                Classification basée sur 10 015 images dermatoscopiques validées.
+                7 catégories : naevus, mélanome, kératose, carcinome, et plus.
+            </div>
+            
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Avertissement médical</strong><br>
+                Cette analyse IA est fournie à titre informatif uniquement.
+                Pour tout diagnostic médical, consultez un dermatologue.
+            </div>
+        </div>
+        
+        <!-- Camera Screen -->
+        <div class="screen" id="camera-screen">
+            <div class="camera-container">
+                <video id="camera-preview" autoplay playsinline></video>
+                <img id="captured-image" style="display: none;">
+                <canvas id="canvas" style="display: none;"></canvas>
+                
+                <div class="camera-overlay">
+                    <div class="camera-hint" id="camera-hint">
+                        <i class="fas fa-bullseye me-1"></i>
+                        Centrez la lésion dans le cercle
+                    </div>
+                    <div class="camera-guide" id="camera-guide"></div>
+                    <div class="camera-controls" id="camera-controls">
+                        <button class="btn-camera-action" onclick="toggleFlash()" id="btn-flash">
+                            <i class="fas fa-bolt"></i>
+                        </button>
+                        <div class="btn-capture" onclick="capturePhoto()" id="btn-capture">
+                            <div class="btn-capture-inner"></div>
+                        </div>
+                        <button class="btn-camera-action" onclick="switchCamera()" id="btn-switch">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons" id="capture-actions" style="display: none;">
+                <button class="btn-action success" onclick="analyzeImage()" id="btn-analyze">
+                    <i class="fas fa-brain"></i>
+                    Analyser avec l'IA
+                </button>
+                <button class="btn-action secondary" onclick="retakePhoto()">
+                    <i class="fas fa-redo"></i>
+                    Reprendre la photo
+                </button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-action secondary" onclick="goToMain()">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </button>
+            </div>
+        </div>
+        
+        <!-- Analysis Screen -->
+        <div class="screen" id="analysis-screen">
+            <div class="analysis-screen">
+                <div class="analysis-animation">
+                    <div class="analysis-ring"></div>
+                    <div class="analysis-ring"></div>
+                    <i class="fas fa-brain analysis-icon"></i>
+                </div>
+                
+                <div class="analysis-text">
+                    <h3>Analyse en cours...</h3>
+                    <p id="analysis-status">Traitement de l'image</p>
+                </div>
+                
+                <div class="analysis-steps">
+                    <div class="analysis-step done" id="step-1">
+                        <div class="step-icon"><i class="fas fa-check"></i></div>
+                        <span>Image capturée</span>
+                    </div>
+                    <div class="analysis-step active" id="step-2">
+                        <div class="step-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                        <span>Extraction des caractéristiques</span>
+                    </div>
+                    <div class="analysis-step" id="step-3">
+                        <div class="step-icon">3</div>
+                        <span>Classification IA</span>
+                    </div>
+                    <div class="analysis-step" id="step-4">
+                        <div class="step-icon">4</div>
+                        <span>Génération du rapport</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div class="screen" id="results-screen">
+            <div class="results-header">
+                <h2><i class="fas fa-check-circle me-2"></i>Analyse terminée</h2>
+                <p>Résultats de la classification IA</p>
+            </div>
+            
+            <!-- Urgency Banner -->
+            <div class="urgency-banner low" id="urgency-banner">
+                <div class="urgency-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="urgency-text">
+                    <h5 id="urgency-title">Surveillance recommandée</h5>
+                    <p id="urgency-message">Consultez si évolution</p>
+                </div>
+            </div>
+            
+            <!-- Image -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <i class="fas fa-image"></i>
+                    <h4>Image analysée</h4>
+                </div>
+                <div class="result-image-container">
+                    <img id="result-image" class="result-image" src="" alt="Image analysée">
+                </div>
+            </div>
+            
+            <!-- Main Prediction -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <i class="fas fa-diagnoses"></i>
+                    <h4>Diagnostic principal</h4>
+                </div>
+                <div class="result-card-body" id="main-prediction">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+            
+            <!-- All Predictions -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <i class="fas fa-list-ol"></i>
+                    <h4>Diagnostics différentiels</h4>
+                </div>
+                <div class="result-card-body" id="predictions-list">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+            
+            <!-- ABCDE Evaluation -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <i class="fas fa-tasks"></i>
+                    <h4>Évaluation ABCDE</h4>
+                </div>
+                <div class="result-card-body">
+                    <p class="mb-3" style="font-size: 0.85rem; color: #666;">
+                        Cliquez sur les critères présents :
+                    </p>
+                    <div class="abcde-grid" id="abcde-grid">
+                        <div class="abcde-item" data-criterion="a" onclick="toggleABCDE(this)">
+                            <span class="letter">A</span>
+                            <span class="label">Asymétrie</span>
+                        </div>
+                        <div class="abcde-item" data-criterion="b" onclick="toggleABCDE(this)">
+                            <span class="letter">B</span>
+                            <span class="label">Bords</span>
+                        </div>
+                        <div class="abcde-item" data-criterion="c" onclick="toggleABCDE(this)">
+                            <span class="letter">C</span>
+                            <span class="label">Couleur</span>
+                        </div>
+                        <div class="abcde-item" data-criterion="d" onclick="toggleABCDE(this)">
+                            <span class="letter">D</span>
+                            <span class="label">Diamètre</span>
+                        </div>
+                        <div class="abcde-item" data-criterion="e" onclick="toggleABCDE(this)">
+                            <span class="letter">E</span>
+                            <span class="label">Évolution</span>
+                        </div>
+                    </div>
+                    <div id="abcde-result" class="mt-3" style="font-size: 0.85rem;"></div>
+                </div>
+            </div>
+            
+            <!-- Recommendations -->
+            <div class="result-card">
+                <div class="result-card-header">
+                    <i class="fas fa-lightbulb"></i>
+                    <h4>Recommandations</h4>
+                </div>
+                <div class="result-card-body">
+                    <ul class="recommendation-list" id="recommendations-list">
+                        <!-- Filled by JS -->
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Medical Disclaimer -->
+            <div class="warning-box" id="medical-disclaimer">
+                <!-- Filled by JS -->
+            </div>
+            
+            <!-- Actions -->
+            <div class="action-buttons">
+                <button class="btn-action success" onclick="saveDiagnostic()">
+                    <i class="fas fa-save"></i>
+                    Enregistrer le diagnostic
+                </button>
+                <button class="btn-action primary" onclick="newDiagnostic()">
+                    <i class="fas fa-plus"></i>
+                    Nouvelle analyse
+                </button>
+                <button class="btn-action secondary" onclick="goToMain()">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <script>
+        // Configuration
+        const API_BASE = 'api/dermatology_ai.php';
+        
+        // State
+        let isModelReady = false;
+        let stream = null;
+        let capturedImageData = null;
+        let analysisResults = null;
+        let facingMode = 'environment';
+        let abcdeCriteria = { a: false, b: false, c: false, d: false, e: false };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeSystem();
+            setupEventListeners();
+        });
+        
+        /**
+         * Initialize the AI system
+         */
+        async function initializeSystem() {
+            updateProgress(10);
+            updateAIStatus('loading', 'Vérification de l\'API...');
+            
+            try {
+                // Check API health
+                const response = await fetch(`${API_BASE}?action=health`);
+                const data = await response.json();
+                
+                if (data.status !== 'success') {
+                    throw new Error('API non disponible');
+                }
+                
+                updateProgress(50);
+                updateAIStatus('loading', 'Chargement de TensorFlow.js...');
+                
+                // Wait for TensorFlow to be ready
+                await tf.ready();
+                
+                updateProgress(100);
+                updateAIStatus('ready', `IA prête - Modèle ${data.data.model} (${data.data.categories} catégories)`);
+                
+                isModelReady = true;
+                document.getElementById('btn-start-diagnostic').classList.remove('disabled');
+                
+                // Hide progress bar after a delay
+                setTimeout(() => {
+                    document.getElementById('progress-container').style.display = 'none';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erreur initialisation:', error);
+                updateAIStatus('error', 'Erreur de chargement. Cliquez pour réessayer.');
+                document.getElementById('ai-status').onclick = () => location.reload();
+            }
+        }
+        
+        /**
+         * Update AI status banner
+         */
+        function updateAIStatus(status, message) {
+            const banner = document.getElementById('ai-status');
+            banner.className = `ai-status-banner ${status}`;
+            
+            let icon = '';
+            if (status === 'loading') {
+                icon = '<div class="spinner-border" role="status"></div>';
+            } else if (status === 'ready') {
+                icon = '<i class="fas fa-check-circle"></i>';
+            } else if (status === 'error') {
+                icon = '<i class="fas fa-exclamation-triangle"></i>';
+            }
+            
+            banner.innerHTML = `${icon}<span>${message}</span>`;
+        }
+        
+        /**
+         * Update progress bar
+         */
+        function updateProgress(percent) {
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+        }
+        
+        /**
+         * Setup event listeners
+         */
+        function setupEventListeners() {
+            document.getElementById('btn-start-diagnostic').addEventListener('click', startDiagnostic);
+        }
+        
+        /**
+         * Show screen
+         */
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        /**
+         * Start diagnostic process
+         */
+        async function startDiagnostic() {
+            if (!isModelReady) {
+                showToast('Le système n\'est pas encore prêt');
+                return;
+            }
+            
+            showScreen('camera-screen');
+            await startCamera();
+        }
+        
+        /**
+         * Start camera
+         */
+        async function startCamera() {
+            try {
+                // Stop existing stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: facingMode,
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+                
+                const video = document.getElementById('camera-preview');
+                video.srcObject = stream;
+                video.style.display = 'block';
+                
+                document.getElementById('captured-image').style.display = 'none';
+                document.getElementById('camera-controls').style.display = 'flex';
+                document.getElementById('camera-guide').style.display = 'block';
+                document.getElementById('camera-hint').style.display = 'block';
+                document.getElementById('capture-actions').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Erreur caméra:', error);
+                showToast('Impossible d\'accéder à la caméra');
+            }
+        }
+        
+        /**
+         * Switch camera (front/back)
+         */
+        async function switchCamera() {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            await startCamera();
+        }
+        
+        /**
+         * Toggle flash (not always supported)
+         */
+        function toggleFlash() {
+            showToast('Flash non disponible sur ce navigateur');
+        }
+        
+        /**
+         * Capture photo
+         */
+        function capturePhoto() {
+            const video = document.getElementById('camera-preview');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('captured-image');
+            
+            // Set canvas size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw image
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // Convert to base64
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
+            capturedImage.src = capturedImageData;
+            
+            // Update UI
+            video.style.display = 'none';
+            capturedImage.style.display = 'block';
+            
+            document.getElementById('camera-controls').style.display = 'none';
+            document.getElementById('camera-guide').style.display = 'none';
+            document.getElementById('camera-hint').style.display = 'none';
+            document.getElementById('capture-actions').style.display = 'flex';
+            
+            // Stop camera
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+        
+        /**
+         * Retake photo
+         */
+        function retakePhoto() {
+            startCamera();
+        }
+        
+        /**
+         * Analyze image with AI
+         */
+        async function analyzeImage() {
+            if (!capturedImageData) {
+                showToast('Aucune image à analyser');
+                return;
+            }
+            
+            showScreen('analysis-screen');
+            
+            try {
+                // Step 2: Feature extraction
+                updateAnalysisStep(2, 'active');
+                document.getElementById('analysis-status').textContent = 'Extraction des caractéristiques...';
+                
+                // Extract basic features client-side for better UX
+                const features = await extractImageFeatures(capturedImageData);
+                
+                await delay(800);
+                updateAnalysisStep(2, 'done');
+                
+                // Step 3: Classification
+                updateAnalysisStep(3, 'active');
+                document.getElementById('analysis-status').textContent = 'Classification en cours...';
+                
+                // Send to API
+                const response = await fetch(`${API_BASE}?action=analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: capturedImageData,
+                        ...features
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'Erreur d\'analyse');
+                }
+                
+                await delay(500);
+                updateAnalysisStep(3, 'done');
+                
+                // Step 4: Report generation
+                updateAnalysisStep(4, 'active');
+                document.getElementById('analysis-status').textContent = 'Génération du rapport...';
+                
+                await delay(500);
+                updateAnalysisStep(4, 'done');
+                
+                // Store results
+                analysisResults = result.data;
+                
+                // Show results
+                await delay(300);
+                displayResults();
+                
+            } catch (error) {
+                console.error('Erreur analyse:', error);
+                showToast('Erreur lors de l\'analyse');
+                goToMain();
+            }
+        }
+        
+        /**
+         * Extract basic image features (client-side)
+         */
+        async function extractImageFeatures(imageData) {
+            // This would normally use TensorFlow.js to extract features
+            // For now, we return metadata that will be used by the server
+            return {
+                timestamp: new Date().toISOString(),
+                client_analysis: true
+            };
+        }
+        
+        /**
+         * Update analysis step UI
+         */
+        function updateAnalysisStep(step, status) {
+            const stepEl = document.getElementById(`step-${step}`);
+            stepEl.className = `analysis-step ${status}`;
+            
+            const icon = stepEl.querySelector('.step-icon');
+            if (status === 'done') {
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+            } else if (status === 'active') {
+                icon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
+        }
+        
+        /**
+         * Display analysis results
+         */
+        function displayResults() {
+            showScreen('results-screen');
+            
+            const { predictions, report } = analysisResults;
+            
+            // Display image
+            document.getElementById('result-image').src = capturedImageData;
+            
+            // Display urgency banner
+            displayUrgencyBanner(report.niveau_urgence);
+            
+            // Display main prediction
+            displayMainPrediction(predictions[0], report);
+            
+            // Display all predictions
+            displayPredictions(predictions);
+            
+            // Display recommendations
+            displayRecommendations(report.recommandations);
+            
+            // Display medical disclaimer
+            document.getElementById('medical-disclaimer').innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${report.avertissement_medical}
+            `;
+            
+            // Reset ABCDE
+            abcdeCriteria = { a: false, b: false, c: false, d: false, e: false };
+            document.querySelectorAll('.abcde-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('abcde-result').innerHTML = '';
+        }
+        
+        /**
+         * Display urgency banner
+         */
+        function displayUrgencyBanner(urgency) {
+            const banner = document.getElementById('urgency-banner');
+            const icon = banner.querySelector('.urgency-icon i');
+            
+            banner.className = `urgency-banner ${urgency.niveau === 3 ? 'high' : urgency.niveau === 2 ? 'medium' : 'low'}`;
+            
+            if (urgency.niveau === 3) {
+                icon.className = 'fas fa-exclamation-triangle';
+            } else if (urgency.niveau === 2) {
+                icon.className = 'fas fa-exclamation-circle';
+            } else {
+                icon.className = 'fas fa-check';
+            }
+            
+            document.getElementById('urgency-title').textContent = 
+                urgency.niveau === 3 ? 'Consultation urgente recommandée' :
+                urgency.niveau === 2 ? 'Consultation conseillée' :
+                'Surveillance régulière';
+            
+            document.getElementById('urgency-message').textContent = urgency.message;
+        }
+        
+        /**
+         * Display main prediction
+         */
+        function displayMainPrediction(prediction, report) {
+            const container = document.getElementById('main-prediction');
+            
+            const confidenceClass = prediction.pourcentage > 70 ? 'confidence-high' :
+                                   prediction.pourcentage > 40 ? 'confidence-medium' : 'confidence-low';
+            
+            container.innerHTML = `
+                <div class="prediction-item" style="background: white; border: 2px solid #e0e0e0;">
+                    <div class="prediction-rank" style="width: 40px; height: 40px; font-size: 1rem;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="prediction-info">
+                        <div class="prediction-name">${prediction.nom}</div>
+                        <div class="prediction-common">${prediction.nom_commun}</div>
+                    </div>
+                    <span class="prediction-confidence ${confidenceClass}">${prediction.pourcentage}%</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 15px;">
+                    ${report.description}
+                </p>
+            `;
+        }
+        
+        /**
+         * Display all predictions
+         */
+        function displayPredictions(predictions) {
+            const container = document.getElementById('predictions-list');
+            
+            container.innerHTML = predictions.slice(0, 5).map((pred, index) => {
+                const confidenceClass = pred.pourcentage > 70 ? 'confidence-high' :
+                                       pred.pourcentage > 40 ? 'confidence-medium' : 'confidence-low';
+                
+                return `
+                    <div class="prediction-item">
+                        <div class="prediction-rank">${index + 1}</div>
+                        <div class="prediction-info">
+                            <div class="prediction-name">${pred.nom}</div>
+                            <div class="prediction-common">${pred.nom_commun}</div>
+                        </div>
+                        <span class="prediction-confidence ${confidenceClass}">${pred.pourcentage}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        /**
+         * Display recommendations
+         */
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendations-list');
+            
+            const icons = [
+                'fa-user-md text-primary',
+                'fa-calendar-check text-success',
+                'fa-sun text-warning',
+                'fa-camera text-info',
+                'fa-notes-medical text-secondary'
+            ];
+            
+            container.innerHTML = recommendations.map((rec, index) => `
+                <li>
+                    <i class="fas ${icons[index % icons.length]}"></i>
+                    <span>${rec}</span>
+                </li>
+            `).join('');
+        }
+        
+        /**
+         * Toggle ABCDE criterion
+         */
+        function toggleABCDE(element) {
+            const criterion = element.dataset.criterion;
+            abcdeCriteria[criterion] = !abcdeCriteria[criterion];
+            element.classList.toggle('active');
+            
+            updateABCDEResult();
+        }
+        
+        /**
+         * Update ABCDE evaluation result
+         */
+        async function updateABCDEResult() {
+            try {
+                const response = await fetch(`${API_BASE}?action=evaluate_abcde`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(abcdeCriteria)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const colorClass = data.niveau_risque === 'eleve' ? 'text-danger' :
+                                      data.niveau_risque === 'modere' ? 'text-warning' : 'text-success';
+                    
+                    document.getElementById('abcde-result').innerHTML = `
+                        <div class="${colorClass}">
+                            <strong>Score : ${data.score}/${data.score_max}</strong><br>
+                            ${data.recommandation}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur ABCDE:', error);
+            }
+        }
+        
+        /**
+         * Save diagnostic
+         */
+        async function saveDiagnostic() {
+            if (!analysisResults) {
+                showToast('Aucun résultat à sauvegarder');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}?action=save_diagnostic`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: capturedImageData,
+                        predictions: analysisResults.predictions,
+                        abcde_score: Object.values(abcdeCriteria).filter(v => v).length
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showToast('Diagnostic enregistré avec succès');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                showToast('Erreur lors de la sauvegarde');
+            }
+        }
+        
+        /**
+         * New diagnostic
+         */
+        function newDiagnostic() {
+            capturedImageData = null;
+            analysisResults = null;
+            startDiagnostic();
+        }
+        
+        /**
+         * Go to main screen
+         */
+        function goToMain() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Reset analysis steps
+            for (let i = 2; i <= 4; i++) {
+                const stepEl = document.getElementById(`step-${i}`);
+                stepEl.className = 'analysis-step';
+                stepEl.querySelector('.step-icon').innerHTML = i;
+            }
+            document.getElementById('step-1').className = 'analysis-step done';
+            
+            showScreen('main-screen');
+        }
+        
+        /**
+         * Show lesion types info
+         */
+        async function showInfo() {
+            try {
+                const response = await fetch(`${API_BASE}?action=get_all_types`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const types = result.data.types;
+                    let html = '<div class="content-section"><h4 class="mb-3">Types de lésions cutanées</h4>';
+                    
+                    types.forEach(type => {
+                        const colorClass = type.gravite === 'grave' ? 'danger' :
+                                          type.gravite === 'precancereux' ? 'warning' :
+                                          type.gravite === 'modere' ? 'info' : 'success';
+                        
+                        html += `
+                            <div class="diagnostic-card mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>${type.nom}</strong><br>
+                                        <small class="text-muted">${type.nom_commun}</small>
+                                    </div>
+                                    <span class="badge bg-${colorClass}">${type.gravite}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '<button class="btn-action secondary mt-3" onclick="goToMain()"><i class="fas fa-arrow-left me-2"></i>Retour</button></div>';
+                    
+                    document.getElementById('main-screen').innerHTML = html;
+                }
+            } catch (error) {
+                showToast('Erreur lors du chargement');
+            }
+        }
+        
+        /**
+         * Show ABCDE info
+         */
+        function showABCDEInfo() {
+            const html = `
+                <div class="content-section">
+                    <h4 class="mb-3">Règle ABCDE</h4>
+                    <p class="text-muted mb-4">Méthode d'auto-surveillance des grains de beauté</p>
+                    
+                    <div class="diagnostic-card mb-2">
+                        <h5 class="text-danger">A - Asymétrie</h5>
+                        <p class="mb-0 small">La moitié de la lésion ne correspond pas à l'autre moitié</p>
+                    </div>
+                    
+                    <div class="diagnostic-card mb-2">
+                        <h5 class="text-danger">B - Bords irréguliers</h5>
+                        <p class="mb-0 small">Contours flous, dentelés ou mal définis</p>
+                    </div>
+                    
+                    <div class="diagnostic-card mb-2">
+                        <h5 class="text-danger">C - Couleur hétérogène</h5>
+                        <p class="mb-0 small">Plusieurs couleurs (brun, noir, rouge, blanc, bleu)</p>
+                    </div>
+                    
+                    <div class="diagnostic-card mb-2">
+                        <h5 class="text-danger">D - Diamètre > 6mm</h5>
+                        <p class="mb-0 small">Plus grand qu'une gomme de crayon</p>
+                    </div>
+                    
+                    <div class="diagnostic-card mb-2">
+                        <h5 class="text-danger">E - Évolution</h5>
+                        <p class="mb-0 small">Changement de taille, forme ou couleur</p>
+                    </div>
+                    
+                    <div class="warning-box mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Si 2 critères ou plus sont présents, consultez un dermatologue rapidement.
+                    </div>
+                    
+                    <button class="btn-action secondary mt-3" onclick="location.reload()">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('main-screen').innerHTML = html;
+        }
+        
+        /**
+         * Show toast notification
+         */
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        /**
+         * Delay helper
+         */
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>

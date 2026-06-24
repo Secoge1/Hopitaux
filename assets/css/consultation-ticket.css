@@ -1,0 +1,363 @@
+/* Ticket de consultation — A4 compact */
+
+:root {
+    --ct-primary: #1b4f9b;
+    --ct-teal: #1b8fad;
+    --ct-accent: #00b5ad;
+    --ct-text: #1e293b;
+    --ct-muted: #64748b;
+    --ct-border: #dbe3ec;
+    --ct-a4-w: 210mm;
+}
+
+.ct-print-page {
+    margin: 0;
+    padding: 1rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 9pt;
+    color: var(--ct-text);
+    background: #d8e2ea;
+}
+
+.ct-print-wrap {
+    width: var(--ct-a4-w);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.ct-print-controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #fff;
+    border: 1px solid var(--ct-border);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(15, 41, 66, 0.12);
+}
+
+.ct-print-controls .btn-ct {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.ct-print-controls .btn-ct--primary {
+    background: linear-gradient(135deg, var(--ct-primary), var(--ct-teal));
+    color: #fff;
+}
+
+.ct-print-controls .btn-ct--ghost {
+    background: #f1f5f9;
+    color: var(--ct-muted);
+}
+
+.ct-doc {
+    background: #fff;
+    border: 1px solid var(--ct-border);
+    box-shadow: 0 4px 24px rgba(15, 41, 66, 0.1);
+}
+
+.ct-doc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 8mm 10mm 6mm;
+    background: linear-gradient(135deg, var(--ct-primary) 0%, var(--ct-teal) 55%, var(--ct-accent) 100%);
+    color: #fff;
+}
+
+.ct-doc-brand h1 {
+    margin: 0 0 2px;
+    font-size: 12pt;
+    font-weight: 800;
+}
+
+.ct-doc-brand p {
+    margin: 0;
+    font-size: 7.5pt;
+    opacity: 0.92;
+    line-height: 1.35;
+}
+
+.ct-doc-meta {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.ct-doc-meta-kicker {
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.88;
+}
+
+.ct-doc-meta-num {
+    font-size: 13pt;
+    font-weight: 800;
+    margin: 2px 0;
+}
+
+.ct-doc-meta-date {
+    font-size: 7pt;
+    opacity: 0.9;
+}
+
+.ct-doc-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: #f8fafc;
+    border-bottom: 2px solid var(--ct-primary);
+}
+
+.ct-doc-strip-item {
+    padding: 3mm 2.5mm;
+    text-align: center;
+    border-right: 1px solid var(--ct-border);
+}
+
+.ct-doc-strip-item:last-child { border-right: none; }
+
+.ct-doc-strip-label {
+    display: block;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ct-muted);
+}
+
+.ct-doc-strip-value {
+    display: block;
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: var(--ct-text);
+    line-height: 1.25;
+}
+
+.ct-doc-body {
+    padding: 5mm 10mm 8mm;
+}
+
+.ct-section {
+    margin-bottom: 4mm;
+    page-break-inside: avoid;
+}
+
+.ct-section-title {
+    margin: 0 0 2mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1px solid var(--ct-border);
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ct-primary);
+}
+
+.ct-dl {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2mm 4mm;
+    margin: 0;
+}
+
+.ct-dl-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5mm;
+}
+
+.ct-dl-item dt {
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ct-muted);
+}
+
+.ct-dl-item dd {
+    margin: 0;
+    font-size: 7.5pt;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.ct-dl-item dd strong {
+    color: var(--ct-primary);
+}
+
+.ct-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7pt;
+}
+
+.ct-table thead th {
+    background: #f1f5f9;
+    color: var(--ct-muted);
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2mm 2.5mm;
+    border: 1px solid var(--ct-border);
+    text-align: left;
+}
+
+.ct-table thead th.text-center,
+.ct-table tbody td.text-center { text-align: center; }
+
+.ct-table thead th.text-end,
+.ct-table tbody td.text-end { text-align: right; }
+
+.ct-table tbody td {
+    padding: 1.8mm 2.5mm;
+    border: 1px solid var(--ct-border);
+    vertical-align: top;
+    line-height: 1.3;
+}
+
+.ct-table tbody tr:nth-child(even) td { background: #fafbfc; }
+
+.ct-table tfoot th {
+    background: #f8fafc;
+    font-size: 7pt;
+    padding: 2mm 2.5mm;
+    border: 1px solid var(--ct-border);
+    text-align: right;
+}
+
+.ct-recap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3mm;
+    margin-bottom: 4mm;
+}
+
+.ct-recap-item {
+    padding: 3mm;
+    border: 1px solid var(--ct-border);
+    border-radius: 4px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.ct-recap-item span {
+    display: block;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ct-muted);
+}
+
+.ct-recap-item strong {
+    display: block;
+    margin-top: 1mm;
+    font-size: 9pt;
+    color: var(--ct-primary);
+}
+
+.ct-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4mm;
+    padding: 4mm 5mm;
+    margin-bottom: 4mm;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #0f766e, var(--ct-teal) 50%, var(--ct-accent));
+    color: #fff;
+}
+
+.ct-total-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ct-total-value {
+    font-size: 14pt;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.ct-medical {
+    font-size: 7.5pt;
+    line-height: 1.4;
+    color: var(--ct-text);
+}
+
+.ct-medical p {
+    margin: 0 0 2mm;
+}
+
+.ct-medical strong {
+    color: var(--ct-primary);
+    font-size: 6.5pt;
+    text-transform: uppercase;
+}
+
+.ct-doc-foot {
+    margin-top: 3mm;
+    padding-top: 3mm;
+    border-top: 1px dashed var(--ct-border);
+    text-align: center;
+    font-size: 6pt;
+    color: var(--ct-muted);
+}
+
+@media (max-width: 768px) {
+    .ct-doc-strip { grid-template-columns: repeat(2, 1fr); }
+    .ct-doc-strip-item:nth-child(2) { border-right: none; }
+    .ct-doc-strip-item:nth-child(1),
+    .ct-doc-strip-item:nth-child(2) { border-bottom: 1px solid var(--ct-border); }
+    .ct-dl { grid-template-columns: 1fr; }
+    .ct-recap { grid-template-columns: 1fr; }
+    .ct-doc-head { flex-direction: column; }
+    .ct-doc-meta { text-align: left; }
+}
+
+@media print {
+    @page { size: A4 portrait; margin: 0; }
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .ct-print-page { padding: 0 !important; }
+    .ct-print-controls { display: none !important; }
+
+    .ct-print-wrap,
+    .ct-doc {
+        width: var(--ct-a4-w) !important;
+        max-width: var(--ct-a4-w) !important;
+        border: none;
+        box-shadow: none;
+    }
+
+    .ct-doc-head,
+    .ct-total {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .ct-section { page-break-inside: avoid; }
+    .ct-table { font-size: 6.5pt; }
+}

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efficasante IA - Redirection</title>
+    <meta http-equiv="refresh" content="0;url=mobile_dermatology_ai.html">
+    <script>
+        // Redirection vers le nouveau module dermatologique
+        window.location.href = 'mobile_dermatology_ai.html';
+    </script>
+</head>
+<body>
+    <p>Redirection vers le nouveau module de diagnostic dermatologique...</p>
+    <p><a href="mobile_dermatology_ai.html">Cliquez ici si la redirection ne fonctionne pas</a></p>
+</body>
+</html>
+<!--
+    ANCIEN CODE CONSERVÉ POUR RÉFÉRENCE
+    ===================================
+    Le nouveau module se trouve dans mobile_dermatology_ai.html
+    
+    Améliorations apportées:
+    - Modèle HAM10000 (7 catégories dermatologiques) au lieu de MobileNet générique
+    - Meilleure gestion des erreurs et états de chargement
+    - Interface utilisateur modernisée
+    - API backend sécurisée (api/dermatology_ai.php)
+    - Base de connaissances dermatologique (includes/DermatologyAI.php)
+    - Évaluation ABCDE intégrée
+-->
+
+<!-- ANCIEN CODE CI-DESSOUS (désactivé)
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .diagnostic-card {
+            margin: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            padding: 20px;
+            color: white;
+        }
+        
+        .diagnostic-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .diagnostic-card.dermatologie {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        
+        .camera-container {
+            position: relative;
+            margin: 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+            min-height: 300px;
+        }
+        
+        #camera-preview, #captured-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .btn-camera {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #2196F3;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .analysis-progress {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            transition: width 1s ease;
+        }
+        
+        .btn-action {
+            width: 100%;
+            margin: 5px 15px;
+            border-radius: 25px;
+            padding: 12px;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px;
+            color: #856404;
+        }
+        
+        .ai-status {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px;
+            color: #155724;
+        }
+        
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            align-items: center;
+        }
+        
+        .prediction-label {
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        
+        .prediction-confidence {
+            background: #2196F3;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- En-tête -->
+        <div class="header">
+            <h2><i class="fas fa-robot me-2"></i>Efficasante IA</h2>
+            <p class="mb-0">Diagnostic Médical avec IA Réelle</p>
+        </div>
+        
+        <!-- Status IA -->
+        <div class="ai-status" id="ai-status">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            Chargement du modèle d'IA...
+        </div>
+        
+        <!-- Écran principal -->
+        <div id="main-screen">
+            <div class="p-3">
+                <h5 class="text-center mb-4">Diagnostic IA Dermatologique</h5>
+                
+                <div class="diagnostic-card dermatologie" onclick="startDiagnostic()">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-camera fa-3x me-3"></i>
+                        <div>
+                            <h5 class="mb-1">Analyser une Lésion</h5>
+                            <small>IA d'analyse d'images médicales</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Avertissement -->
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Note :</strong> Cette IA utilise un modèle générique d'analyse d'images. 
+                Pour un diagnostic médical précis, consultez un professionnel de santé.
+            </div>
+        </div>
+        
+        <!-- Écran de capture -->
+        <div id="camera-screen" style="display: none;">
+            <div class="camera-container">
+                <video id="camera-preview" autoplay></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <img id="captured-image" style="display: none;">
+                <button class="btn-camera" id="capture-btn" onclick="capturePhoto()">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+            
+            <div class="p-3">
+                <button class="btn btn-primary btn-action" onclick="analyzeImage()" id="analyze-btn" style="display: none;">
+                    <i class="fas fa-brain me-2"></i>Analyser avec l'IA
+                </button>
+                <button class="btn btn-secondary btn-action" onclick="retakePhoto()" id="retake-btn" style="display: none;">
+                    <i class="fas fa-redo me-2"></i>Reprendre la Photo
+                </button>
+                <button class="btn btn-secondary btn-action" onclick="goBack()">
+                    <i class="fas fa-arrow-left me-2"></i>Retour
+                </button>
+            </div>
+        </div>
+        
+        <!-- Écran d'analyse -->
+        <div id="analysis-screen" style="display: none;">
+            <div class="analysis-progress">
+                <div class="spinner"></div>
+                <h5>Analyse IA en cours...</h5>
+                <p>L'intelligence artificielle analyse votre image</p>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Écran de résultats -->
+        <div id="results-screen" style="display: none;">
+            <div class="p-3">
+                <h5 class="text-center mb-4"><i class="fas fa-check-circle text-success me-2"></i>Résultats de l'Analyse IA</h5>
+                
+                <!-- Image analysée -->
+                <div class="result-card">
+                    <h6><i class="fas fa-image me-2"></i>Image Analysée</h6>
+                    <img id="result-image" class="img-fluid rounded" style="max-height: 200px; width: 100%;">
+                </div>
+                
+                <!-- Prédictions IA -->
+                <div class="result-card">
+                    <h6><i class="fas fa-brain me-2"></i>Détections de l'IA</h6>
+                    <div id="predictions-list">
+                        <!-- Les prédictions seront ajoutées ici -->
+                    </div>
+                </div>
+                
+                <!-- Interprétation médicale -->
+                <div class="result-card">
+                    <h6><i class="fas fa-stethoscope me-2"></i>Interprétation Médicale</h6>
+                    <div id="medical-interpretation">
+                        <!-- L'interprétation sera ajoutée ici -->
+                    </div>
+                </div>
+                
+                <!-- Recommandations -->
+                <div class="result-card">
+                    <h6><i class="fas fa-lightbulb me-2"></i>Recommandations</h6>
+                    <div id="recommendations">
+                        <!-- Les recommandations seront ajoutées ici -->
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <button class="btn btn-success btn-action" onclick="saveToServer()">
+                    <i class="fas fa-save me-2"></i>Enregistrer le Diagnostic
+                </button>
+                <button class="btn btn-primary btn-action" onclick="newDiagnostic()">
+                    <i class="fas fa-plus me-2"></i>Nouveau Diagnostic
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Variables globales
+        let model = null;
+        let stream = null;
+        let capturedImageData = null;
+        let predictions = null;
+        
+        // Charger le modèle IA au démarrage
+        async function loadModel() {
+            try {
+                document.getElementById('ai-status').innerHTML = 
+                    '<i class="fas fa-spinner fa-spin me-2"></i>Chargement du modèle d\'IA...';
+                
+                // Charger MobileNet (modèle léger pour mobile)
+                model = await mobilenet.load();
+                
+                document.getElementById('ai-status').innerHTML = 
+                    '<i class="fas fa-check-circle me-2"></i>IA prête ! Modèle MobileNet chargé avec succès.';
+                document.getElementById('ai-status').style.background = '#d4edda';
+                
+                console.log('✅ Modèle IA chargé avec succès');
+            } catch (error) {
+                console.error('❌ Erreur lors du chargement du modèle:', error);
+                document.getElementById('ai-status').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle me-2"></i>Erreur de chargement de l\'IA. Veuillez recharger la page.';
+                document.getElementById('ai-status').style.background = '#f8d7da';
+                document.getElementById('ai-status').style.color = '#721c24';
+            }
+        }
+        
+        // Démarrer le diagnostic
+        function startDiagnostic() {
+            if (!model) {
+                alert('Le modèle IA n\'est pas encore chargé. Veuillez patienter...');
+                return;
+            }
+            
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('camera-screen').style.display = 'block';
+            startCamera();
+        }
+        
+        // Démarrer la caméra
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                const video = document.getElementById('camera-preview');
+                video.srcObject = stream;
+                video.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Erreur caméra:', error);
+                alert('Impossible d\'accéder à la caméra. Veuillez autoriser l\'accès.');
+            }
+        }
+        
+        // Capturer la photo
+        function capturePhoto() {
+            const video = document.getElementById('camera-preview');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('captured-image');
+            
+            // Configurer le canvas aux dimensions de la vidéo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Dessiner l'image
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0);
+            
+            // Convertir en image
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+            capturedImage.src = capturedImageData;
+            
+            // Afficher l'image capturée
+            video.style.display = 'none';
+            capturedImage.style.display = 'block';
+            
+            // Afficher les boutons d'action
+            document.getElementById('capture-btn').style.display = 'none';
+            document.getElementById('analyze-btn').style.display = 'block';
+            document.getElementById('retake-btn').style.display = 'block';
+            
+            // Arrêter la caméra
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+        
+        // Reprendre la photo
+        function retakePhoto() {
+            const video = document.getElementById('camera-preview');
+            const capturedImage = document.getElementById('captured-image');
+            
+            video.style.display = 'block';
+            capturedImage.style.display = 'none';
+            
+            document.getElementById('capture-btn').style.display = 'block';
+            document.getElementById('analyze-btn').style.display = 'none';
+            document.getElementById('retake-btn').style.display = 'none';
+            
+            startCamera();
+        }
+        
+        // Analyser l'image avec l'IA
+        async function analyzeImage() {
+            if (!model) {
+                alert('Le modèle IA n\'est pas chargé.');
+                return;
+            }
+            
+            // Passer à l'écran d'analyse
+            document.getElementById('camera-screen').style.display = 'none';
+            document.getElementById('analysis-screen').style.display = 'block';
+            
+            try {
+                // Obtenir l'image
+                const img = document.getElementById('captured-image');
+                
+                // Analyser avec TensorFlow.js
+                console.log('🔍 Analyse de l\'image en cours...');
+                predictions = await model.classify(img);
+                console.log('✅ Prédictions:', predictions);
+                
+                // Afficher les résultats après un court délai
+                setTimeout(() => {
+                    showResults();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'analyse:', error);
+                alert('Erreur lors de l\'analyse de l\'image.');
+                goBack();
+            }
+        }
+        
+        // Afficher les résultats
+        function showResults() {
+            document.getElementById('analysis-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'block';
+            
+            // Afficher l'image
+            document.getElementById('result-image').src = capturedImageData;
+            
+            // Afficher les prédictions
+            const predictionsList = document.getElementById('predictions-list');
+            predictionsList.innerHTML = '';
+            
+            predictions.forEach((pred, index) => {
+                const confidence = (pred.probability * 100).toFixed(1);
+                const confidenceColor = confidence > 70 ? '#28a745' : confidence > 40 ? '#ffc107' : '#dc3545';
+                
+                predictionsList.innerHTML += `
+                    <div class="prediction-item">
+                        <span class="prediction-label">${index + 1}. ${pred.className}</span>
+                        <span class="prediction-confidence" style="background: ${confidenceColor}">
+                            ${confidence}%
+                        </span>
+                    </div>
+                `;
+            });
+            
+            // Générer l'interprétation médicale
+            generateMedicalInterpretation();
+            
+            // Générer les recommandations
+            generateRecommendations();
+        }
+        
+        // Générer l'interprétation médicale basée sur les prédictions
+        function generateMedicalInterpretation() {
+            const interpretation = document.getElementById('medical-interpretation');
+            const topPrediction = predictions[0];
+            const confidence = (topPrediction.probability * 100).toFixed(1);
+            
+            // Analyse basée sur les mots-clés dans les prédictions
+            const keywords = predictions.map(p => p.className.toLowerCase()).join(' ');
+            
+            let medicalText = '';
+            
+            // Détection de mots-clés médicaux
+            if (keywords.includes('skin') || keywords.includes('mole') || keywords.includes('spot')) {
+                medicalText = `
+                    <div class="alert alert-info">
+                        <strong>Analyse dermatologique :</strong><br>
+                        L'IA a détecté des éléments pouvant être liés à la peau. 
+                        Confiance : ${confidence}%<br><br>
+                        <strong>Éléments détectés :</strong> ${topPrediction.className}
+                    </div>
+                `;
+            } else {
+                medicalText = `
+                    <div class="alert alert-warning">
+                        <strong>Analyse générale :</strong><br>
+                        L'IA a identifié : ${topPrediction.className} (confiance : ${confidence}%)<br><br>
+                        Cette détection nécessite une validation par un professionnel de santé qualifié.
+                    </div>
+                `;
+            }
+            
+            interpretation.innerHTML = medicalText;
+        }
+        
+        // Générer les recommandations
+        function generateRecommendations() {
+            const recommendations = document.getElementById('recommendations');
+            const topConfidence = (predictions[0].probability * 100);
+            
+            let recText = '<ul class="list-unstyled">';
+            
+            if (topConfidence > 70) {
+                recText += `
+                    <li><i class="fas fa-check text-success me-2"></i>Détection avec haute confiance</li>
+                    <li><i class="fas fa-user-md text-primary me-2"></i>Consultation médicale recommandée pour confirmation</li>
+                    <li><i class="fas fa-camera text-info me-2"></i>Surveiller l'évolution avec photos régulières</li>
+                `;
+            } else if (topConfidence > 40) {
+                recText += `
+                    <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>Détection avec confiance moyenne</li>
+                    <li><i class="fas fa-user-md text-danger me-2"></i>Consultation médicale fortement recommandée</li>
+                    <li><i class="fas fa-redo text-secondary me-2"></i>Reprendre la photo avec meilleur éclairage</li>
+                `;
+            } else {
+                recText += `
+                    <li><i class="fas fa-question-circle text-danger me-2"></i>Détection incertaine</li>
+                    <li><i class="fas fa-user-md text-danger me-2"></i>Consultation médicale obligatoire</li>
+                    <li><i class="fas fa-camera text-info me-2"></i>Reprendre la photo dans de meilleures conditions</li>
+                `;
+            }
+            
+            recText += `
+                <li><i class="fas fa-clock text-secondary me-2"></i>En cas de changement rapide, consulter en urgence</li>
+                <li><i class="fas fa-save text-success me-2"></i>Enregistrer ce diagnostic pour suivi</li>
+            </ul>`;
+            
+            recommendations.innerHTML = recText;
+        }
+        
+        // Enregistrer sur le serveur
+        async function saveToServer() {
+            // Préparer les données à envoyer
+            const diagnosticData = {
+                image: capturedImageData,
+                predictions: predictions,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                // Envoyer au serveur PHP
+                const response = await fetch('api/ia_diagnostic.php?action=save_ai_diagnostic', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(diagnosticData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('✅ Diagnostic enregistré avec succès !');
+                } else {
+                    alert('⚠️ Erreur lors de l\'enregistrement : ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erreur d\'enregistrement:', error);
+                alert('⚠️ Impossible de contacter le serveur. Le diagnostic est conservé localement.');
+            }
+        }
+        
+        // Nouveau diagnostic
+        function newDiagnostic() {
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            capturedImageData = null;
+            predictions = null;
+        }
+        
+        // Retour
+        function goBack() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            document.getElementById('camera-screen').style.display = 'none';
+            document.getElementById('analysis-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            
+            // Réinitialiser les boutons
+            document.getElementById('capture-btn').style.display = 'block';
+            document.getElementById('analyze-btn').style.display = 'none';
+            document.getElementById('retake-btn').style.display = 'none';
+            document.getElementById('camera-preview').style.display = 'block';
+            document.getElementById('captured-image').style.display = 'none';
+        }
+        
+        // Charger le modèle au démarrage
+        loadModel();
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,92 @@
+.detail-loading, .detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 16px;
+  color: var(--outline);
+}
+.detail-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.detail-actions-row .back-link { margin: 0; }
+.detail-action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.detail-action-buttons .btn-sm {
+  padding: 8px 14px;
+  font-size: .875rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+.detail-action-buttons .btn-primary { color: var(--on-primary); background: var(--primary); border: none; }
+.detail-action-buttons .btn-secondary {
+  color: var(--primary);
+  background: var(--primary-container);
+  border: 1px solid var(--primary);
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: .9375rem;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.detail-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.detail-header h1 { margin: 0 0 8px; font-size: 1.5rem; }
+.detail-meta { margin: 0; font-size: .875rem; color: var(--outline); }
+.detail-section {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.detail-section h2 {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+.detail-row {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--outline-variant);
+  font-size: .9375rem;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label {
+  min-width: 140px;
+  color: var(--outline);
+}
+.detail-value { flex: 1; }

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Frais de Soins - EfficaSanté</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .hero {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        .section-card {
+            border-left: 5px solid;
+            transition: all 0.3s;
+        }
+        .section-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .soins-section { border-color: #28a745; }
+        .tarifs-section { border-color: #17a2b8; }
+        .btn-xl {
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <i class="fas fa-money-bill-wave" style="font-size: 5rem; color: #28a745; margin-bottom: 20px;"></i>
+            <h1 style="color: #667eea;">Gestion des Frais de Soins</h1>
+            <p class="lead fs-4 mb-4">Centre de configuration des tarifs et des soins médicaux</p>
+            <p class="text-muted">Gérez tous vos tarifs de consultations et catalogues de soins en un seul endroit</p>
+        </div>
+        
+        <!-- Navigation rapide -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <a href="#soins" class="text-decoration-none">
+                    <div class="card section-card soins-section">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-syringe feature-icon text-success"></i>
+                            <h3 class="mb-3">💊 Catalogue des Soins</h3>
+                            <p class="text-muted mb-3">Gérez les actes médicaux et leurs prix</p>
+                            <span class="badge bg-success fs-6 px-4 py-2">Accéder</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="#tarifs" class="text-decoration-none">
+                    <div class="card section-card tarifs-section">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-calculator feature-icon text-info"></i>
+                            <h3 class="mb-3">💰 Tarifs de Consultation</h3>
+                            <p class="text-muted mb-3">Configurez les tarifs par type et spécialité</p>
+                            <span class="badge bg-info fs-6 px-4 py-2">Accéder</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Section 1: Catalogue des Soins -->
+        <div id="soins" class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-syringe me-2"></i>💊 Catalogue des Soins Médicaux</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>Qu'est-ce qu'un soin ?</h5>
+                    <p class="mb-0">Les soins sont les actes médicaux que vous pouvez ajouter lors d'une consultation : pansements, injections, sutures, etc. Chaque soin a un nom, un type, un prix et une durée.</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="mb-3">📋 Types de soins disponibles :</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-band-aid me-2"></i>Pansements
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-syringe me-2"></i>Injections
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-stethoscope me-2"></i>Examens
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-heartbeat me-2"></i>Soins intensifs
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-pills me-2"></i>Perfusions
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="badge bg-primary mb-2 w-100 p-3">
+                                    <i class="fas fa-cut me-2"></i>Petite chirurgie
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="parametres/soins.php" class="btn btn-success btn-xl">
+                        <i class="fas fa-cog me-2"></i>Gérer le catalogue des soins
+                    </a>
+                    <div class="mt-3">
+                        <small class="text-muted">Ajouter, modifier ou désactiver des soins</small>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>Fonctionnalités :</h6>
+                        <ul>
+                            <li>✅ Ajouter un nouveau soin</li>
+                            <li>✅ Modifier les prix et informations</li>
+                            <li>✅ Activer/désactiver des soins</li>
+                            <li>✅ Organiser par type de soin</li>
+                            <li>✅ Définir la durée estimée</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lightbulb text-warning me-2"></i>Utilisation :</h6>
+                        <p class="text-muted">Les soins configurés ici apparaîtront dans la liste déroulante lors de l'ajout de soins à une consultation. Le prix sera automatiquement calculé selon la quantité.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 2: Tarifs de Consultation -->
+        <div id="tarifs" class="card">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0"><i class="fas fa-calculator me-2"></i>💰 Tarifs de Consultation</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Qu'est-ce qu'un tarif de consultation ?</h5>
+                    <p class="mb-0">Les tarifs de consultation définissent le prix de base d'une consultation selon son type (normale, urgence, domicile) et la spécialité du médecin (généraliste, cardiologue, pédiatre, etc.).</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">📊 Types de consultation :</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <i class="fas fa-user-md text-primary me-2"></i>
+                                <strong>Consultation normale</strong> - Visite planifiée
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-ambulance text-danger me-2"></i>
+                                <strong>Consultation d'urgence</strong> - Intervention rapide
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-home text-success me-2"></i>
+                                <strong>Consultation à domicile</strong> - Visite du médecin
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-users text-info me-2"></i>
+                                <strong>Consultation de suivi</strong> - Contrôle régulier
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">🩺 Spécialités médicales :</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <i class="fas fa-heartbeat text-danger me-2"></i>Cardiologie
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-baby text-info me-2"></i>Pédiatrie
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-brain text-purple me-2"></i>Neurologie
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-stethoscope text-success me-2"></i>Médecine générale
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="parametres/tarifs.php" class="btn btn-info btn-xl">
+                        <i class="fas fa-cog me-2"></i>Gérer les tarifs de consultation
+                    </a>
+                    <div class="mt-3">
+                        <small class="text-muted">Configurer les prix par type et spécialité</small>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-info me-2"></i>Fonctionnalités :</h6>
+                        <ul>
+                            <li>✅ Définir les tarifs par type de consultation</li>
+                            <li>✅ Prix différenciés par spécialité</li>
+                            <li>✅ Activer/désactiver des tarifs</li>
+                            <li>✅ Descriptions personnalisées</li>
+                            <li>✅ Historique des modifications</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lightbulb text-warning me-2"></i>Utilisation :</h6>
+                        <p class="text-muted">Les tarifs configurés ici seront automatiquement suggérés lors de la création d'une consultation. Le système sélectionnera le tarif correspondant au type de consultation et à la spécialité du médecin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Guide rapide -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0"><i class="fas fa-question-circle me-2"></i>❓ Comment utiliser</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-success"><i class="fas fa-syringe me-2"></i>Pour ajouter un soin :</h5>
+                        <ol>
+                            <li>Cliquez sur "Gérer le catalogue des soins"</li>
+                            <li>Cliquez sur "Ajouter un soin"</li>
+                            <li>Remplissez :
+                                <ul>
+                                    <li>Nom du soin (ex: "Pansement simple")</li>
+                                    <li>Type de soin (ex: "Pansement")</li>
+                                    <li>Prix (ex: 2500 FCFA)</li>
+                                    <li>Durée estimée (ex: 15 minutes)</li>
+                                    <li>Description (optionnel)</li>
+                                </ul>
+                            </li>
+                            <li>Enregistrez</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-info"><i class="fas fa-calculator me-2"></i>Pour modifier un tarif :</h5>
+                        <ol>
+                            <li>Cliquez sur "Gérer les tarifs de consultation"</li>
+                            <li>Trouvez le tarif à modifier</li>
+                            <li>Cliquez sur "Modifier"</li>
+                            <li>Changez :
+                                <ul>
+                                    <li>Le prix</li>
+                                    <li>Le type de consultation</li>
+                                    <li>La spécialité</li>
+                                    <li>La description</li>
+                                </ul>
+                            </li>
+                            <li>Enregistrez les modifications</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5><i class="fas fa-lightbulb text-warning me-2"></i>💡 Conseils pratiques :</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="alert alert-primary">
+                            <strong>Nomenclature claire :</strong><br>
+                            Utilisez des noms précis et compréhensibles pour vos soins (ex: "Pansement simple" plutôt que "Pansement")
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-success">
+                            <strong>Prix réalistes :</strong><br>
+                            Basez-vous sur les tarifs du marché et ajustez selon votre structure
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-warning">
+                            <strong>Révision régulière :</strong><br>
+                            Mettez à jour vos tarifs au moins une fois par an
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions rapides -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-bolt me-2"></i>⚡ Actions rapides</h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <a href="parametres/soins.php" class="btn btn-success btn-lg w-100 mb-2">
+                            <i class="fas fa-syringe fa-2x mb-2 d-block"></i>
+                            Gérer les soins
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="parametres/tarifs.php" class="btn btn-info btn-lg w-100 mb-2">
+                            <i class="fas fa-calculator fa-2x mb-2 d-block"></i>
+                            Gérer les tarifs
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="consultations/index.php" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fas fa-stethoscope fa-2x mb-2 d-block"></i>
+                            Consultations
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="dashboard.php" class="btn btn-secondary btn-lg w-100 mb-2">
+                            <i class="fas fa-home fa-2x mb-2 d-block"></i>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-white mt-4 mb-3">
+            <p class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Pour toute question, consultez la documentation ou contactez l'administrateur système
+            </p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

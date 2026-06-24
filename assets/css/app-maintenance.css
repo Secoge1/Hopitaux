@@ -1,0 +1,186 @@
+/* Maintenance — panneaux & fiche intervention */
+
+.maint-panel,
+.maint-sidebar-panel {
+    background: var(--app-surface, #fff);
+    border: 1px solid var(--app-border, #e2e8f0);
+    border-radius: 14px;
+    overflow: visible;
+    box-shadow: 0 4px 14px rgba(15, 41, 66, 0.06);
+}
+
+.maint-panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #14b8a6 100%);
+    color: #fff;
+    border-radius: 14px 14px 0 0;
+}
+
+.maint-panel-head h2,
+.maint-panel-head h5 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.maint-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #1e293b;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.maint-count-badge strong {
+    color: #0f766e;
+    font-weight: 700;
+}
+
+.maint-count-badge i {
+    color: #0d9488;
+}
+
+.maint-panel-body {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.maint-panel-body .app-mod-table-wrap {
+    border: 1px solid var(--app-border, #e2e8f0);
+    box-shadow: none;
+    border-radius: 12px;
+    overflow: visible;
+}
+
+.maint-panel-body .app-mod-table-wrap .table-responsive {
+    overflow: visible;
+}
+
+.maint-info-list {
+    margin: 0;
+}
+
+.maint-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px dashed var(--app-border, #e2e8f0);
+}
+
+.maint-info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.maint-info-row dt {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--app-muted, #64748b);
+    flex: 0 0 42%;
+}
+
+.maint-info-row dd {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--app-text, #1e293b);
+    text-align: right;
+}
+
+.maint-cout {
+    font-weight: 700;
+    color: var(--app-primary-dark, #1b4f9b);
+    white-space: nowrap;
+}
+
+.maint-desc {
+    display: block;
+    max-width: 220px;
+    font-size: 0.82rem;
+    color: var(--app-muted, #64748b);
+    line-height: 1.35;
+}
+
+.maint-panel .mod-actions-btn-text {
+    display: none !important;
+}
+
+.maint-panel .mod-actions-btn {
+    min-width: 34px;
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+}
+
+.maint-panel .mod-actions-header {
+    display: none;
+}
+
+.maint-panel .mod-actions-menu {
+    z-index: 1080;
+}
+
+/* Types d'intervention */
+.mod-badge--preventive {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.mod-badge--corrective {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.mod-badge--reparation {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.mod-badge--calibrage {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.mod-badge--autre {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.mod-badge--en_maintenance {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+@media (max-width: 767.98px) {
+    .maint-panel-head {
+        padding: 0.85rem 1rem;
+    }
+
+    .maint-panel-body {
+        padding: 0.85rem;
+    }
+
+    .maint-info-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .maint-info-row dd {
+        text-align: left;
+    }
+}

@@ -1,0 +1,76 @@
+# FICHIER .htaccess - GESTION DU CACHE
+# À placer à la racine de votre site
+
+# Activer le moteur de réécriture
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+</IfModule>
+
+# ============================================================================
+# DÉSACTIVER LE CACHE POUR LES FICHIERS PHP
+# ============================================================================
+<FilesMatch "\.(php)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "Sat, 26 Jul 1997 05:00:00 GMT"
+        Header unset ETag
+        Header always set X-Content-Type-Options "nosniff"
+    </IfModule>
+    FileETag None
+</FilesMatch>
+
+# ============================================================================
+# CACHE COURT POUR LES ASSETS (CSS, JS, Images)
+# Utiliser le versioning dans les URLs pour forcer le rechargement
+# ============================================================================
+<IfModule mod_headers.c>
+    # CSS et JavaScript - Cache de 1 heure
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+    </FilesMatch>
+    
+    # Images - Cache de 1 jour
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+    
+    # Fonts - Cache de 1 semaine
+    <FilesMatch "\.(woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+</IfModule>
+
+# ============================================================================
+# COMPRESSION GZIP pour améliorer les performances
+# ============================================================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# ============================================================================
+# EMPÊCHER LE CACHE DES RÉPONSES AJAX
+# ============================================================================
+<IfModule mod_headers.c>
+    SetEnvIf Request_URI "\.php$" is_ajax
+    Header set Cache-Control "no-cache, no-store, must-revalidate" env=is_ajax
+</IfModule>
+
+# ============================================================================
+# SÉCURITÉ SUPPLÉMENTAIRE
+# ============================================================================
+<IfModule mod_headers.c>
+    # Empêcher le clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Empêcher le MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Activer le filtre XSS
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Empêcher l'accès aux fichiers sensibles
+<FilesMatch "(\.env|\.git|\.htaccess|\.htpasswd|cache_version\.txt)$">
+    Require all denied
+</FilesMatch>

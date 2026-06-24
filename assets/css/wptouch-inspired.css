@@ -1,0 +1,600 @@
+/* ========================================
+   SYSTÈME INSPIRÉ DE WPTOUCH
+   Interface mobile native avec navigation en bas
+   ======================================== */
+
+/* Variables pour le thème WPtouch-like */
+:root {
+    --wptouch-primary: #0073aa;
+    --wptouch-secondary: #005177;
+    --wptouch-accent: #00a0d2;
+    --wptouch-bg: #ffffff;
+    --wptouch-text: #333333;
+    --wptouch-border: #e5e5e5;
+    --wptouch-shadow: rgba(0, 0, 0, 0.1);
+    
+    --bottom-nav-height: 60px;
+    --top-bar-height: 50px;
+    --sidebar-width: 280px;
+}
+
+/* ========================================
+   BARRE DE NAVIGATION EN BAS (MOBILE)
+   Style WPtouch - Navigation native
+   ======================================== */
+
+@media (max-width: 767px) {
+    /* Barre de navigation en bas */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--bottom-nav-height);
+        background: var(--wptouch-bg);
+        border-top: 1px solid var(--wptouch-border);
+        box-shadow: 0 -2px 10px var(--wptouch-shadow);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0.5rem 0;
+        padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+    
+    .mobile-bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        text-decoration: none;
+        color: #666;
+        transition: all 0.3s ease;
+        min-height: 44px;
+        position: relative;
+    }
+    
+    .mobile-bottom-nav-item i {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-bottom-nav-item span {
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .mobile-bottom-nav-item.active {
+        color: var(--wptouch-primary);
+    }
+    
+    .mobile-bottom-nav-item.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 3px;
+        background: var(--wptouch-primary);
+        border-radius: 0 0 3px 3px;
+    }
+    
+    .mobile-bottom-nav-item:active {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+    
+    /* Badge de notification sur les items */
+    .mobile-bottom-nav-item .nav-badge {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.5rem;
+        background: #dc3545;
+        color: white;
+        border-radius: 10px;
+        padding: 0.15rem 0.4rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        min-width: 18px;
+        text-align: center;
+        line-height: 1.2;
+    }
+    
+    /* Ajuster le contenu pour la barre du bas */
+    body.has-mobile-bottom-nav .app-content,
+    body.has-mobile-bottom-nav .main-content,
+    body.has-mobile-bottom-nav .col-md-9,
+    body.has-mobile-bottom-nav .col-lg-10 {
+        padding-bottom: calc(var(--bottom-nav-height) + 1rem) !important;
+    }
+
+    /* Mode mobile global : pas de barre wptouch */
+    body.body-mobile-mode .mobile-bottom-nav,
+    body.body-mobile-mode .mobile-top-bar {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   TOP BAR MOBILE (Style WPtouch)
+   ======================================== */
+
+@media (max-width: 767px) {
+    /* app-shell utilise sa propre topbar — ne pas injecter de bandeau wptouch */
+    body.app-shell .mobile-top-bar {
+        display: none !important;
+    }
+
+    .mobile-top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--top-bar-height);
+        background: var(--wptouch-primary);
+        color: white;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px var(--wptouch-shadow);
+        padding-top: env(safe-area-inset-top, 0);
+    }
+    
+    .mobile-top-bar .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .mobile-top-bar .logo img {
+        height: 32px;
+        width: auto;
+    }
+    
+    .mobile-top-bar .actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .mobile-top-bar .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    /* Cacher le bouton menu dans la top bar sur la page de consultation */
+    body[data-page="consultation"] .mobile-top-bar #mobile-menu-btn,
+    body[data-page="consultation"] .mobile-top-bar .btn-icon:has(.fa-bars),
+    html[data-page*="consultation"] .mobile-top-bar #mobile-menu-btn {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+    
+    .mobile-top-bar .btn-icon:active {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0.95);
+    }
+    
+    /* Ajuster le contenu pour la top bar (ancien layout uniquement) */
+    body:not(.app-shell) .main-content,
+    body:not(.app-shell) .col-md-9,
+    body:not(.app-shell) .col-lg-10 {
+        padding-top: calc(var(--top-bar-height) + 1rem) !important;
+    }
+}
+
+/* ========================================
+   SIDEBAR SLIDE-IN (Style WPtouch)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .sidebar,
+    .col-md-3,
+    .col-lg-2 {
+        background: var(--wptouch-bg);
+        box-shadow: 2px 0 10px var(--wptouch-shadow);
+    }
+    
+    /* Header de la sidebar mobile */
+    .sidebar .mobile-sidebar-header {
+        background: var(--wptouch-primary);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar .mobile-sidebar-header .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .sidebar .mobile-sidebar-header .close-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar .mobile-sidebar-header .close-btn:active {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0.95);
+    }
+    
+    /* Navigation dans la sidebar */
+    .sidebar .nav-link {
+        border-bottom: 1px solid #f0f0f0;
+        color: var(--wptouch-text);
+        font-weight: 500;
+    }
+    
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        background: #f8f9fa;
+        color: var(--wptouch-primary);
+        border-left: 3px solid var(--wptouch-primary);
+    }
+    
+    .sidebar .nav-link i {
+        width: 24px;
+        text-align: center;
+        color: var(--wptouch-primary);
+    }
+}
+
+/* ========================================
+   ANIMATIONS FLUIDES (Style WPtouch)
+   ======================================== */
+
+@media (max-width: 767px) {
+    /* Animation d'entrée pour les pages */
+    @keyframes wptouchSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .main-content,
+    .col-md-9,
+    .col-lg-10 {
+        animation: wptouchSlideIn 0.3s ease-out;
+    }
+    
+    /* Animation pour la sidebar */
+    @keyframes wptouchSlideInLeft {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
+    
+    .sidebar.active {
+        animation: wptouchSlideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Animation pour l'overlay */
+    @keyframes wptouchFadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    #auto-sidebar-overlay.active {
+        animation: wptouchFadeIn 0.3s ease-out;
+    }
+    
+    /* Animation pour les cartes */
+    @keyframes wptouchCardIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card {
+        animation: wptouchCardIn 0.4s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+}
+
+/* ========================================
+   CARTES STYLE WPTOUCH
+   ======================================== */
+
+@media (max-width: 767px) {
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--wptouch-shadow);
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid var(--wptouch-border);
+        padding: 1rem;
+        font-weight: 600;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    /* Stats cards style WPtouch */
+    .stats-card,
+    .stat-card {
+        background: linear-gradient(135deg, var(--wptouch-primary) 0%, var(--wptouch-secondary) 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .stats-card h4,
+    .stat-card h4 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        color: white;
+    }
+    
+    .stats-card p,
+    .stat-card p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================
+   BOUTONS STYLE WPTOUCH
+   ======================================== */
+
+@media (max-width: 767px) {
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+        padding: 0.875rem 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px var(--wptouch-shadow);
+    }
+    
+    .btn-primary {
+        background: var(--wptouch-primary);
+        border-color: var(--wptouch-primary);
+    }
+    
+    .btn-primary:active {
+        background: var(--wptouch-secondary);
+        transform: scale(0.98);
+        box-shadow: 0 1px 3px var(--wptouch-shadow);
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
+    }
+}
+
+/* ========================================
+   FORMULAIRES STYLE WPTOUCH
+   ======================================== */
+
+@media (max-width: 767px) {
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        border: 2px solid var(--wptouch-border);
+        padding: 0.875rem 1rem;
+        font-size: 1rem; /* Évite le zoom sur iOS */
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--wptouch-primary);
+        box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--wptouch-text);
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ========================================
+   TABLEAUX STYLE WPTOUCH
+   ======================================== */
+
+@media (max-width: 767px) {
+    .table-responsive {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--wptouch-shadow);
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table thead {
+        background: #f8f9fa;
+    }
+    
+    .table thead th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #666;
+        padding: 1rem 0.75rem;
+    }
+    
+    .table tbody td {
+        padding: 1rem 0.75rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+}
+
+/* ========================================
+   SWIPE GESTURES (Style WPtouch)
+   ======================================== */
+
+@media (max-width: 767px) {
+    /* Indicateur de swipe */
+    .swipe-indicator {
+        position: fixed;
+        bottom: calc(var(--bottom-nav-height) + 1rem);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        z-index: 9998;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .swipe-indicator.show {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   PULL TO REFRESH (Style WPtouch)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .pull-to-refresh {
+        position: fixed;
+        top: calc(var(--top-bar-height) + 1rem);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--wptouch-primary);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        z-index: 9998;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .pull-to-refresh.show {
+        opacity: 1;
+    }
+    
+    .pull-to-refresh i {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+}
+
+/* ========================================
+   SAFE AREA SUPPORT (iPhone X et plus)
+   ======================================== */
+
+@media (max-width: 767px) {
+    body:not(.app-shell):not(.body-mobile-mode) {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .mobile-bottom-nav {
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    body:not(.app-shell) .mobile-top-bar {
+        padding-top: env(safe-area-inset-top, 0px);
+        height: calc(var(--top-bar-height) + env(safe-area-inset-top, 0px));
+    }
+}
+
+/* ========================================
+   MASQUER SUR DESKTOP
+   ======================================== */
+
+@media (min-width: 768px) {
+    .mobile-bottom-nav,
+    .mobile-top-bar,
+    .swipe-indicator,
+    .pull-to-refresh {
+        display: none !important;
+    }
+}
+

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrections des Anomalies - EfficaSanté</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        .badge-fixed {
+            background-color: #28a745;
+        }
+        .badge-pending {
+            background-color: #ffc107;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .icon-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .icon-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .icon-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .test-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1><i class="fas fa-tools me-3"></i>Corrections des Anomalies - EfficaSanté</h1>
+    
+    <div class="container">
+        <!-- Résumé -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-info-circle me-2"></i>Résumé des corrections
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="display-4 text-success"><i class="fas fa-check-circle"></i></div>
+                        <h5 class="mt-2">3 Anomalies</h5>
+                        <p class="text-muted">Identifiées et corrigées</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="display-4 text-info"><i class="fas fa-file-code"></i></div>
+                        <h5 class="mt-2">4 Fichiers</h5>
+                        <p class="text-muted">Modifiés</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="display-4 text-warning"><i class="fas fa-database"></i></div>
+                        <h5 class="mt-2">1 Script</h5>
+                        <p class="text-muted">De correction créé</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anomalie 1 -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box icon-success">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">1. Compteur de Médecins incorrect</h5>
+                        <small><span class="badge badge-fixed">✅ CORRIGÉ</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-bug text-danger me-2"></i>Problème identifié :</h6>
+                <ul>
+                    <li>Le système comptait uniquement les médecins avec <code>statut = 'actif'</code></li>
+                    <li>Cela excluait les médecins avec d'autres statuts valides (inactif, congé, etc.)</li>
+                    <li>Après suppression d'un médecin, le compteur ne diminuait pas correctement</li>
+                </ul>
+
+                <h6 class="mt-4"><i class="fas fa-wrench text-success me-2"></i>Solution appliquée :</h6>
+                <p>Modification de la requête pour exclure uniquement les médecins supprimés :</p>
+                <div class="code-block">
+                    <strong>Avant :</strong><br>
+                    SELECT COUNT(*) FROM medecins WHERE statut = 'actif'<br><br>
+                    <strong>Après :</strong><br>
+                    SELECT COUNT(*) FROM medecins WHERE statut != 'supprime'
+                </div>
+
+                <h6 class="mt-4"><i class="fas fa-file-code text-primary me-2"></i>Fichiers modifiés :</h6>
+                <ul>
+                    <li><code>includes/CacheSystem.php</code> - ligne 295</li>
+                    <li><code>includes/init.php</code> - ligne 134</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Anomalie 2 -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box icon-success">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">2. Cache non invalidé lors de suppression de consultations</h5>
+                        <small><span class="badge badge-fixed">✅ CORRIGÉ</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-bug text-danger me-2"></i>Problème identifié :</h6>
+                <ul>
+                    <li>Lors de la suppression d'une consultation, le cache du dashboard n'était pas invalidé</li>
+                    <li>Le compteur de consultations restait incorrect jusqu'au prochain rafraîchissement automatique</li>
+                    <li>Les utilisateurs voyaient des données obsolètes</li>
+                </ul>
+
+                <h6 class="mt-4"><i class="fas fa-wrench text-success me-2"></i>Solution appliquée :</h6>
+                <p>Ajout de l'invalidation du cache dans la méthode <code>delete()</code> du modèle Consultation</p>
+                <div class="code-block">
+                    // Invalider le cache du dashboard pour mettre à jour le compteur<br>
+                    try {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;require_once __DIR__ . '/../includes/CacheSystem.php';<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;CacheSystem::getInstance()->invalidateDashboardCache();<br>
+                    } catch (Exception $e) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;// Ignorer les erreurs de cache<br>
+                    }
+                </div>
+
+                <h6 class="mt-4"><i class="fas fa-file-code text-primary me-2"></i>Fichiers modifiés :</h6>
+                <ul>
+                    <li><code>models/Consultation.php</code> - méthode <code>delete()</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Anomalie 3 -->
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box icon-warning">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">3. Vérification de la structure de la base de données</h5>
+                        <small><span class="badge badge-pending">🔧 ACTION REQUISE</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Problème potentiel :</h6>
+                <ul>
+                    <li>Les ENUM des colonnes <code>statut</code> peuvent ne pas inclure 'supprime'</li>
+                    <li>Les colonnes <code>date_suppression</code> peuvent être absentes</li>
+                    <li>Cela peut causer des erreurs lors des suppressions logiques</li>
+                </ul>
+
+                <h6 class="mt-4"><i class="fas fa-wrench text-success me-2"></i>Solution créée :</h6>
+                <p>Script de vérification et correction automatique créé : <code>config/fix_database_enums.php</code></p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Ce script vérifie et corrige :</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>L'ENUM de <code>patients.statut</code> (ajout de 'supprime' si absent)</li>
+                        <li>L'ENUM de <code>medecins.statut</code> (ajout de 'supprime' si absent)</li>
+                        <li>La colonne <code>patients.date_suppression</code> (création si absente)</li>
+                        <li>La colonne <code>medecins.date_suppression</code> (création si absente)</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-play-circle me-2"></i>Instructions d'utilisation :</h6>
+                    <ol>
+                        <li>Ouvrir un navigateur</li>
+                        <li>Accéder à : <code>http://localhost/efficasante/config/fix_database_enums.php</code></li>
+                        <li>Suivre les instructions à l'écran</li>
+                        <li>Vérifier que toutes les corrections sont appliquées avec succès</li>
+                    </ol>
+                    <a href="config/fix_database_enums.php" class="btn btn-warning" target="_blank">
+                        <i class="fas fa-play me-2"></i>Exécuter le script maintenant
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tests recommandés -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-flask me-2"></i>Tests recommandés
+            </div>
+            <div class="card-body">
+                <div class="test-item">
+                    <h6><i class="fas fa-user-injured text-primary me-2"></i>Test 1 : Suppression d'un patient</h6>
+                    <ol class="mb-0">
+                        <li>Noter le compteur actuel de patients</li>
+                        <li>Supprimer un patient</li>
+                        <li>Rafraîchir le dashboard</li>
+                        <li>Vérifier que le compteur a diminué de 1</li>
+                    </ol>
+                </div>
+
+                <div class="test-item">
+                    <h6><i class="fas fa-user-md text-success me-2"></i>Test 2 : Suppression d'un médecin</h6>
+                    <ol class="mb-0">
+                        <li>Noter le compteur actuel de médecins</li>
+                        <li>Supprimer un médecin</li>
+                        <li>Rafraîchir le dashboard</li>
+                        <li>Vérifier que le compteur a diminué de 1</li>
+                    </ol>
+                </div>
+
+                <div class="test-item">
+                    <h6><i class="fas fa-stethoscope text-warning me-2"></i>Test 3 : Suppression d'une consultation</h6>
+                    <ol class="mb-0">
+                        <li>Noter le compteur actuel de consultations du jour</li>
+                        <li>Supprimer une consultation du jour</li>
+                        <li>Rafraîchir le dashboard</li>
+                        <li>Vérifier que le compteur a diminué de 1</li>
+                    </ol>
+                </div>
+
+                <div class="test-item">
+                    <h6><i class="fas fa-undo text-info me-2"></i>Test 4 : Restauration</h6>
+                    <ol class="mb-0">
+                        <li>Accéder à <code>patients/restaurer.php</code></li>
+                        <li>Restaurer un patient supprimé</li>
+                        <li>Vérifier que le compteur augmente de 1</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture de suppression -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <i class="fas fa-sitemap me-2"></i>Architecture de suppression du système
+            </div>
+            <div class="card-body">
+                <h6>Le système utilise une suppression logique (Soft Delete) pour préserver l'intégrité des données :</h6>
+                
+                <table class="table table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Type</th>
+                            <th>Action</th>
+                            <th>Invalidation cache</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Patients</strong></td>
+                            <td><span class="badge bg-success">Soft Delete</span></td>
+                            <td>statut = 'supprime' + date_suppression</td>
+                            <td><i class="fas fa-check text-success"></i> Oui</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Médecins</strong></td>
+                            <td><span class="badge bg-success">Soft Delete</span></td>
+                            <td>statut = 'supprime' + date_suppression</td>
+                            <td><i class="fas fa-check text-success"></i> Oui</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Consultations</strong></td>
+                            <td><span class="badge bg-danger">Hard Delete</span></td>
+                            <td>DELETE FROM (+ données liées)</td>
+                            <td><i class="fas fa-check text-success"></i> Oui</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-info-circle me-2"></i>Avantages de la suppression logique :</h6>
+                    <ul class="mb-0">
+                        <li>✅ Préservation de l'historique</li>
+                        <li>✅ Possibilité de restauration</li>
+                        <li>✅ Intégrité référentielle maintenue</li>
+                        <li>✅ Audit trail complet</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="fas fa-tools me-2"></i>Maintenance et cache
+            </div>
+            <div class="card-body">
+                <h6>Invalidation automatique du cache :</h6>
+                <p>Le cache du dashboard est automatiquement invalidé lors de :</p>
+                <ul>
+                    <li>Suppression d'un patient</li>
+                    <li>Suppression d'un médecin</li>
+                    <li>Suppression d'une consultation</li>
+                    <li>Restauration d'un patient ou médecin</li>
+                </ul>
+
+                <h6 class="mt-4">Invalidation manuelle :</h6>
+                <p>Deux méthodes pour forcer la mise à jour :</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-sync-alt text-primary me-2"></i>Méthode 1 : Bouton du Dashboard</h6>
+                                <p class="mb-0">Utiliser le bouton de rafraîchissement dans le dashboard (icône sync)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-terminal text-success me-2"></i>Méthode 2 : Script direct</h6>
+                                <p class="mb-0"><code>includes/cache_actions.php?action=refresh_cache</code></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Durée du cache :</h6>
+                <ul>
+                    <li><strong>Dashboard :</strong> 180 secondes (3 minutes)</li>
+                    <li><strong>Listes de patients :</strong> 180 secondes (3 minutes)</li>
+                    <li><strong>Listes de médecins :</strong> 300 secondes (5 minutes)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-bolt me-2"></i>Actions rapides
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="config/fix_database_enums.php" class="btn btn-warning btn-lg w-100" target="_blank">
+                            <i class="fas fa-database me-2"></i>Corriger la base de données
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="dashboard.php" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-tachometer-alt me-2"></i>Retour au Dashboard
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="includes/cache_actions.php?action=refresh_cache" class="btn btn-info btn-lg w-100" target="_blank">
+                            <i class="fas fa-sync-alt me-2"></i>Actualiser le cache
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card">
+            <div class="card-body text-center">
+                <p class="mb-0">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Document généré automatiquement</strong> - 
+                    Système EfficaSanté v2.0 - 
+                    <?php echo date('d/m/Y H:i:s'); ?>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

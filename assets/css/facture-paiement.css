@@ -1,0 +1,471 @@
+/* Facture de paiement — A4 compact */
+
+:root {
+    --fp-primary: #1b4f9b;
+    --fp-teal: #1b8fad;
+    --fp-accent: #00b5ad;
+    --fp-text: #1e293b;
+    --fp-muted: #64748b;
+    --fp-border: #dbe3ec;
+    --fp-surface: #ffffff;
+    --fp-a4-w: 210mm;
+    --fp-a4-h: 297mm;
+}
+
+/* ── Page impression ── */
+.facture-print-page {
+    margin: 0;
+    padding: 1rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 10pt;
+    color: var(--fp-text);
+    background: #d8e2ea;
+}
+
+.facture-preview-wrap {
+    max-width: var(--fp-a4-w);
+    margin: 0 auto;
+}
+
+.facture-preview-wrap--a4 {
+    width: var(--fp-a4-w);
+    max-width: 100%;
+}
+
+.facture-print-controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--fp-surface);
+    border: 1px solid var(--fp-border);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(15, 41, 66, 0.12);
+}
+
+.facture-print-controls .btn-fp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.facture-print-controls .btn-fp--primary {
+    background: linear-gradient(135deg, var(--fp-primary), var(--fp-teal));
+    color: #fff;
+}
+
+.facture-print-controls .btn-fp--ghost {
+    background: #f1f5f9;
+    color: var(--fp-muted);
+}
+
+/* ── Document A4 ── */
+.facture-doc--a4 {
+    width: 100%;
+    min-height: var(--fp-a4-h);
+    background: var(--fp-surface);
+    border: 1px solid var(--fp-border);
+    box-shadow: 0 4px 24px rgba(15, 41, 66, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.facture-doc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 10mm 12mm 8mm;
+    background: linear-gradient(135deg, var(--fp-primary) 0%, var(--fp-teal) 60%, var(--fp-accent) 100%);
+    color: #fff;
+}
+
+.facture-doc-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.facture-doc-logo img,
+.facture-doc-logo svg {
+    max-height: 16mm;
+    max-width: 48mm;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    background: #fff;
+    border-radius: 6px;
+    padding: 3px;
+}
+
+.facture-doc-brand-text h1 {
+    margin: 0 0 1px;
+    font-size: 12pt;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.facture-doc-brand-text p {
+    margin: 0;
+    font-size: 7.5pt;
+    line-height: 1.35;
+    opacity: 0.92;
+}
+
+.facture-doc-meta {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.facture-doc-meta-kicker {
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.88;
+}
+
+.facture-doc-meta-num {
+    font-size: 13pt;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 2px 0 4px;
+}
+
+.facture-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 6.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.facture-status--paye { background: rgba(22, 101, 52, 0.35); }
+.facture-status--partiel { background: rgba(3, 105, 161, 0.35); }
+.facture-status--en_attente { background: rgba(133, 77, 14, 0.35); }
+.facture-status--annule { background: rgba(153, 27, 27, 0.35); }
+
+/* Bandeau infos rapides */
+.facture-doc-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-bottom: 2px solid var(--fp-primary);
+    background: #f8fafc;
+}
+
+.facture-strip-item {
+    padding: 5mm 4mm;
+    border-right: 1px solid var(--fp-border);
+    text-align: center;
+}
+
+.facture-strip-item:last-child {
+    border-right: none;
+}
+
+.facture-strip-label {
+    display: block;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fp-muted);
+    margin-bottom: 2px;
+}
+
+.facture-strip-value {
+    display: block;
+    font-size: 8pt;
+    font-weight: 600;
+    color: var(--fp-text);
+    line-height: 1.25;
+}
+
+/* Corps */
+.facture-doc-body {
+    flex: 1;
+    padding: 7mm 12mm 10mm;
+    display: flex;
+    flex-direction: column;
+    gap: 5mm;
+}
+
+.facture-block {
+    border: 1px solid var(--fp-border);
+    border-radius: 6px;
+    overflow: hidden;
+    page-break-inside: avoid;
+}
+
+.facture-block-title {
+    margin: 0;
+    padding: 3mm 4mm;
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.facture-block--patient .facture-block-title {
+    background: #ecfdf5;
+    color: #047857;
+    border-bottom: 1px solid #bbf7d0;
+}
+
+.facture-block--consult .facture-block-title {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-bottom: 1px solid #bfdbfe;
+}
+
+.facture-block--payment .facture-block-title {
+    background: #fffbeb;
+    color: #b45309;
+    border-bottom: 1px solid #fde68a;
+}
+
+.facture-dl {
+    margin: 0;
+    padding: 3mm 4mm;
+    display: grid;
+    gap: 2mm 5mm;
+}
+
+.facture-dl--2col { grid-template-columns: repeat(2, 1fr); }
+.facture-dl--3col { grid-template-columns: repeat(3, 1fr); }
+
+.facture-dl-item {
+    display: flex;
+    align-items: baseline;
+    gap: 3mm;
+    min-width: 0;
+}
+
+.facture-dl-item dt {
+    flex: 0 0 auto;
+    min-width: 18mm;
+    font-size: 6.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--fp-muted);
+}
+
+.facture-dl-item dd {
+    margin: 0;
+    font-size: 8pt;
+    font-weight: 500;
+    color: var(--fp-text);
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.facture-dl-item dd strong {
+    font-weight: 700;
+    color: var(--fp-primary);
+}
+
+/* Montant */
+.facture-total {
+    margin-top: auto;
+    page-break-inside: avoid;
+}
+
+.facture-total-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4mm;
+    padding: 5mm 6mm;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #0f766e, var(--fp-teal) 50%, var(--fp-accent));
+    color: #fff;
+}
+
+.facture-total-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.95;
+}
+
+.facture-total-value {
+    font-size: 16pt;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+.facture-doc-foot {
+    padding-top: 3mm;
+    border-top: 1px dashed var(--fp-border);
+    text-align: center;
+}
+
+.facture-doc-foot p {
+    margin: 0;
+    font-size: 6.5pt;
+    color: var(--fp-muted);
+    line-height: 1.4;
+}
+
+/* Aperçu module (écran) */
+.app-module-body .facture-preview-wrap {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .facture-doc-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .facture-strip-item:nth-child(2) {
+        border-right: none;
+    }
+
+    .facture-strip-item:nth-child(1),
+    .facture-strip-item:nth-child(2) {
+        border-bottom: 1px solid var(--fp-border);
+    }
+
+    .facture-dl--3col,
+    .facture-dl--2col {
+        grid-template-columns: 1fr;
+    }
+
+    .facture-doc-head {
+        flex-direction: column;
+        padding: 8mm 10mm 6mm;
+    }
+
+    .facture-doc-meta {
+        text-align: left;
+        width: 100%;
+    }
+
+    .facture-preview-wrap--a4 {
+        width: 100%;
+    }
+
+    .facture-print-controls {
+        left: 0.5rem;
+        right: 0.5rem;
+        top: auto;
+        bottom: 0.5rem;
+        justify-content: center;
+    }
+}
+
+/* ── Impression A4 ── */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    html, body {
+        width: var(--fp-a4-w);
+        height: auto;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        font-size: 9pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body.facture-print-page {
+        padding: 0 !important;
+    }
+
+    .facture-print-controls,
+    .app-sidebar,
+    .app-sidebar-overlay,
+    .app-topbar,
+    .app-page-header,
+    .app-notifications-card,
+    .app-module-toolbar,
+    .app-module-body > .alert {
+        display: none !important;
+    }
+
+    .app-main { margin-left: 0 !important; }
+
+    .app-content,
+    .app-module-body,
+    .facture-preview-wrap,
+    .facture-preview-wrap--a4 {
+        width: var(--fp-a4-w) !important;
+        max-width: var(--fp-a4-w) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .facture-doc--a4 {
+        width: var(--fp-a4-w);
+        min-height: auto;
+        border: none;
+        box-shadow: none;
+        page-break-after: avoid;
+    }
+
+    .facture-doc-head {
+        padding: 8mm 10mm 6mm;
+    }
+
+    .facture-doc-body {
+        padding: 5mm 10mm 8mm;
+        gap: 4mm;
+    }
+
+    .facture-doc-logo img,
+    .facture-doc-logo svg {
+        max-height: 12mm;
+        max-width: 28mm;
+    }
+
+    .facture-doc-brand-text h1 { font-size: 11pt; }
+    .facture-doc-brand-text p { font-size: 7pt; }
+    .facture-doc-meta-num { font-size: 12pt; }
+
+    .facture-strip-item { padding: 3mm 3mm; }
+    .facture-strip-label { font-size: 5.5pt; }
+    .facture-strip-value { font-size: 7.5pt; }
+
+    .facture-block-title { padding: 2mm 3mm; font-size: 6.5pt; }
+    .facture-dl { padding: 2.5mm 3mm; gap: 1.5mm 4mm; }
+    .facture-dl-item dt { font-size: 6pt; min-width: 16mm; }
+    .facture-dl-item dd { font-size: 7.5pt; }
+
+    .facture-total-inner { padding: 4mm 5mm; }
+    .facture-total-value { font-size: 14pt; }
+
+    .facture-doc-foot p { font-size: 6pt; }
+
+    .facture-block,
+    .facture-total,
+    .facture-doc-head {
+        page-break-inside: avoid;
+    }
+}

@@ -1,0 +1,440 @@
+/* Finances — liste écritures & panneaux latéraux */
+
+.fin-panel {
+    background: var(--app-surface, #fff);
+    border: 1px solid var(--app-border, #e2e8f0);
+    border-radius: 14px;
+    overflow: visible;
+    box-shadow: 0 4px 14px rgba(15, 41, 66, 0.06);
+}
+
+.fin-panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #1b4f9b 0%, #1b8fad 55%, #00b5ad 100%);
+    color: #fff;
+}
+
+.fin-panel-head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.fin-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #1e293b;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.fin-count-badge strong {
+    color: #1b4f9b;
+    font-weight: 700;
+}
+
+.fin-count-badge i {
+    color: #1b8fad;
+}
+
+.fin-panel-body {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.fin-panel-body .app-mod-filter {
+    margin-bottom: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.fin-panel-body .app-mod-table-wrap {
+    border: 1px solid var(--app-border, #e2e8f0);
+    box-shadow: none;
+    border-radius: 12px;
+    overflow: visible;
+}
+
+.fin-panel-body .app-mod-table-wrap .table-responsive {
+    overflow: visible;
+}
+
+.fin-compte-cell {
+    min-width: 140px;
+    max-width: 220px;
+}
+
+.fin-compte-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-right: 0.35rem;
+    vertical-align: middle;
+}
+
+.fin-compte-tag--debit {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.fin-compte-tag--credit {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.fin-compte-lib {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--app-text, #1e293b);
+    line-height: 1.25;
+    margin-top: 0.15rem;
+}
+
+.fin-montant {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--app-primary-dark, #1b4f9b);
+}
+
+.fin-panel .mod-actions-btn-text {
+    display: none !important;
+}
+
+.fin-panel .mod-actions-btn {
+    min-width: 34px;
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+}
+
+.fin-panel .mod-actions-menu {
+    z-index: 1080;
+}
+
+.fin-panel .mod-actions-header {
+    display: none;
+}
+
+.fin-sidebar-panel {
+    background: var(--app-surface, #fff);
+    border: 1px solid var(--app-border, #e2e8f0);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(15, 41, 66, 0.06);
+    height: 100%;
+}
+
+.fin-sidebar-head {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #14b8a6 100%);
+    color: #fff;
+}
+
+.fin-sidebar-head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.fin-sidebar-body {
+    padding: 0.75rem 1rem 1rem;
+}
+
+.fin-compte-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed var(--app-border, #e2e8f0);
+}
+
+.fin-compte-row:last-of-type {
+    border-bottom: none;
+}
+
+.fin-compte-row .mod-code {
+    display: inline-block;
+    margin-bottom: 0.2rem;
+}
+
+@media (max-width: 991.98px) {
+    .fin-compte-cell {
+        max-width: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .fin-panel-head,
+    .fin-sidebar-head {
+        padding: 0.85rem 1rem;
+    }
+
+    .fin-panel-body {
+        padding: 0.85rem;
+    }
+}
+
+/* Comptes — soldes & grilles KPI */
+.fin-solde-pos {
+    color: #15803d;
+    font-weight: 700;
+}
+
+.fin-solde-neg {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.fin-comptes-kpis .app-mod-stat,
+.fin-comptes-totaux .app-mod-stat {
+    min-width: 0;
+}
+
+.fin-comptes-totaux .app-mod-stat-val {
+    font-size: 1.15rem;
+}
+
+@media (min-width: 1200px) {
+    .fin-comptes-kpis {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .fin-comptes-totaux {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Bilan comptable */
+.fin-bilan-line {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    border: 1px solid var(--app-border, #e2e8f0);
+    background: #f8fafc;
+    height: 100%;
+}
+
+.fin-bilan-line-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.fin-bilan-line-val {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--app-primary-dark, #1b4f9b);
+}
+
+.fin-bilan-line--produit {
+    border-left: 4px solid #0d9488;
+}
+
+.fin-bilan-line--charge {
+    border-left: 4px solid #d97706;
+}
+
+.fin-bilan-line--resultat {
+    border-left: 4px solid #6366f1;
+    background: #eef2ff;
+}
+
+/* Badges types de compte (plan comptable) */
+.mod-badge--passif {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.mod-badge--produit {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.mod-badge--charge {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.mod-badge--capitaux {
+    background: #f3e8ff;
+    color: #6d28d9;
+}
+
+@media print {
+    .app-sidebar,
+    .app-sidebar-overlay,
+    .app-module-toolbar,
+    .app-mod-toolbar,
+    .fin-bilan-filters,
+    .fin-bilan-alert,
+    .app-topbar,
+    .app-page-header,
+    .fin-comptes-totaux,
+    .no-print {
+        display: none !important;
+    }
+
+    .app-main,
+    .app-content,
+    .app-module-body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .fin-panel {
+        break-inside: avoid;
+        box-shadow: none;
+    }
+}
+
+/* En-têtes panneaux variantes */
+.fin-panel-head--violet {
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #8b5cf6 100%);
+}
+
+.fin-panel-head--slate {
+    background: linear-gradient(135deg, #334155 0%, #475569 55%, #64748b 100%);
+}
+
+/* Formulaires finances */
+.fin-form-body .form-label {
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.fin-detail-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.fin-detail-val {
+    font-size: 0.95rem;
+    color: var(--app-text, #1e293b);
+}
+
+/* Budgets */
+.app-module-body .fin-budget-card.card {
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    border-top-width: 4px;
+    border-top-style: solid;
+    background: #fff;
+    overflow: hidden;
+}
+
+.app-module-body .fin-budget-card--medecine { border-top-color: #0d9488; }
+.app-module-body .fin-budget-card--pharmacie { border-top-color: #7c3aed; }
+.app-module-body .fin-budget-card--equipement { border-top-color: #2563eb; }
+.app-module-body .fin-budget-card--personnel { border-top-color: #d97706; }
+.app-module-body .fin-budget-card--maintenance { border-top-color: #64748b; }
+.app-module-body .fin-budget-card--autre { border-top-color: #6366f1; }
+
+.app-module-body .fin-budget-card .card-header {
+    padding: 0.9rem 1rem;
+    background: #f8fafc;
+}
+
+.app-module-body .fin-budget-card .card-body {
+    padding: 1rem;
+}
+
+.app-module-body .fin-budget-kpi {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+.app-module-body .fin-budget-kpi-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.2rem;
+}
+
+.app-module-body .fin-budget-kpi-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1b4f9b;
+    line-height: 1.2;
+}
+
+.app-module-body .fin-budget-progress {
+    background-color: #e2e8f0;
+    border-radius: 999px;
+}
+
+.app-module-body .fin-budget-progress .progress-bar {
+    border-radius: 999px;
+    min-width: 2px;
+}
+
+.app-module-body .fin-budget-card .badge.rounded-pill {
+    padding: 0.35em 0.65em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 50rem;
+    box-shadow: none;
+    transform: none;
+}
+
+.app-module-body .fin-budget-card .badge.rounded-pill:hover {
+    transform: none;
+}
+
+.app-module-body .fin-budget-card .mod-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    box-shadow: none;
+    transform: none;
+}
+
+.app-module-body .fin-budget-card .mod-badge:hover {
+    transform: none;
+}
+
+.app-module-body .fin-budget-card .mod-badge--approuve {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.app-module-body .fin-budget-card .mod-badge--cloture {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.fin-modal-header {
+    background: linear-gradient(135deg, #1b4f9b 0%, #1b8fad 100%);
+    color: #fff;
+}
