@@ -1,0 +1,32 @@
+# Dépendances
+/vendor/
+/node_modules/
+efficasante_web/node_modules/
+efficasante_app/.dart_tool/
+efficasante_app/build/
+
+# Build / cache
+efficasante_web/dist/
+/cache/
+*.log
+/logs/
+
+# Données sensibles et uploads
+.env
+.env.local
+*.env
+!/efficasante_web/.env.example
+/uploads/
+/web_upload/
+/backups/
+
+# Archives locales
+*.zip
+*.tar.gz
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
