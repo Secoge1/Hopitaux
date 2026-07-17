@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'main.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/biometric_lock_screen.dart';
 
 class AppRouter extends StatelessWidget {
   const AppRouter({super.key});
@@ -11,10 +12,13 @@ class AppRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthNotifier>(
       builder: (_, auth, __) {
-        if (auth.isLoggedIn) {
-          return const HomeScreen();
+        if (!auth.isLoggedIn) {
+          return const LoginScreen();
         }
-        return const LoginScreen();
+        if (auth.needsBiometricUnlock) {
+          return const BiometricLockScreen();
+        }
+        return const HomeScreen();
       },
     );
   }

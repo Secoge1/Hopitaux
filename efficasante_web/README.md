@@ -23,15 +23,17 @@ npm install
 
 ## Configure API URL
 
-Create `.env` (or set in CI):
+Create `.env` (copy from `.env.example`):
 
 ```env
-# Optional: base URL of your Efficasante backend (no trailing slash)
-# If omitted, uses same origin + /efficasante
-VITE_API_BASE_URL=http://localhost/efficasante
+# Local WAMP
+VITE_API_BASE_URL=http://localhost/Hopitaux
+
+# Production build
+# VITE_API_BASE_URL=https://sesante.secogesarl.com
 ```
 
-For **production**, set `VITE_API_BASE_URL` to your real backend (e.g. `https://yourdomain.com/efficasante`).
+If omitted when the PWA is served from the same domain as PHP, `window.location.origin` is used.
 
 ## Run
 

@@ -1,7 +1,9 @@
 <?php
 /**
- * Diffusion inline des documents patients (aperçu PDF / image dans iframe).
+ * Diffusion inline des documents patients (aperçu PDF / image).
  */
+
+define('APP_SKIP_HTML_CONTENT_TYPE', true);
 
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/module_guard.php';

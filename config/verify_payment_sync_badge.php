@@ -35,7 +35,8 @@ $checks = [
     ['includes/payment_sync_badge.php', 'app_payment_sync_global_banner', 'Bandeau global'],
     ['includes/payment_sync_badge.php', 'app_payment_sync_new_badge', 'Badge carte'],
     ['includes/payment_sync_badge.php', 'localStorage', 'Persistance localStorage'],
-    ['includes/payment_sync_badge.php', 'data-feature-stamp', 'Empreinte activation'],
+    ['includes/payment_sync_badge.php', 'data-notice-kind', 'Bandeau vs badge séparés'],
+    ['includes/payment_sync_badge.php', 'data-notice-kind="badge"', 'Badge carte typé'],
     ['includes/payment_sync_badge.php', 'payment_finance_sync_enabled', 'Gate feature'],
     ['includes/app_module_layout.php', 'app_payment_sync_global_banner', 'Injection layout module'],
     ['consultations/voir.php', 'app_payment_sync_new_badge', 'Badge fiche consultation'],
@@ -89,6 +90,8 @@ strpos($api, 'bindApiUserContext') !== false
 
 $publicChecks = [
     ['home.php', 'public_payment_sync_spotlight', 'Accueil — bandeau sync'],
+    ['includes/public_layout.php', 'pub-sync-flash', 'Accueil — bandeau compact flash vue'],
+    ['includes/documentation_sections.php', "'flash'", 'Contenu flash vue sync'],
     ['documentation.php', 'sync-paiements', 'Documentation — section sync'],
     ['documentation.php', 'features-plateforme', 'Documentation — catalogue features'],
     ['includes/documentation_sections.php', 'doc_payment_sync_public', 'Contenu sync public'],
@@ -112,8 +115,8 @@ echo "1. Feature payment_finance_sync activée (Admin plateforme)\n";
 echo "2. WEB : page module paiements | consultations | laboratoire | finances\n";
 echo "2. APP : écran principal après connexion (Flutter + React PWA)\n";
 echo "3. Utilisateur connecté\n";
-echo "4. Stockage local sans empreinte pour cette activation (localStorage / SharedPreferences)\n";
-echo "5. Bandeau visible 10 s puis masqué ; réapparaît si réactivation feature\n";
+echo "4. Stockage local sans empreinte pour cette activation (clés séparées bandeau / badge)\n";
+echo "5. Bandeau : visible 10 s puis masqué ; badge carte : reste affiché jusqu'à réactivation\n";
 echo "6. API : GET /api/rest/index.php?path=tenant/notices (Bearer token)\n";
 
 echo "\n--- Résumé ---\n";

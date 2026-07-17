@@ -166,6 +166,7 @@ class SubscriptionPlan
             ['text' => 'Encaissement unifié consultations & analyses labo', 'ok' => true],
             ['text' => 'Personnel, rapports & statistiques', 'ok' => true],
             ['text' => 'Application mobile & PWA', 'ok' => true],
+            ['text' => 'PharmaPro ERP — ERP officine autonome (tarifs dédiés)', 'ok' => true],
         ];
 
         $normalized = self::normalizeSlug($slug);

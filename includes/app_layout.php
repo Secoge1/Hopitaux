@@ -15,19 +15,7 @@ if (!function_exists('app_bind_layout_context')) {
     }
 }
 
-if (!function_exists('app_url')) {
-    function app_url(string $path = ''): string
-    {
-        if (!function_exists('efficasante_web_base_path')) {
-            require_once __DIR__ . '/header_logo.php';
-        }
-        $base = efficasante_web_base_path();
-        if ($path === '') {
-            return $base === '' ? '/' : $base;
-        }
-        return rtrim($base, '/') . '/' . ltrim($path, '/');
-    }
-
+if (!function_exists('app_prepare_context')) {
     function app_prepare_context(): array
     {
         $auth = Auth::getInstance();
@@ -58,25 +46,35 @@ if (!function_exists('app_url')) {
             require_once __DIR__ . '/roles.php';
         }
         $items = [
+            // Vue d'ensemble
             ['key' => 'home',       'href' => 'index.php',                    'icon' => 'fa-home',             'label' => 'Accueil',       'roles' => null],
-            ['key' => 'guide',      'href' => 'parametres/guide_utilisateurs.php', 'icon' => 'fa-book',        'label' => 'Guide',         'roles' => null],
             ['key' => 'dashboard',  'href' => 'dashboard.php',                'icon' => 'fa-tachometer-alt',   'label' => 'Dashboard',     'roles' => null],
+            ['sep' => true],
+            // Parcours patient & soins
             ['key' => 'patients',   'href' => 'patients/',                    'icon' => 'fa-user-injured',     'label' => 'Patients',      'module' => 'patients'],
-            ['key' => 'medecins',   'href' => 'medecins/',                    'icon' => 'fa-user-md',          'label' => 'Médecins',      'module' => 'medecins'],
             ['key' => 'rdv',        'href' => 'rendez-vous/',                 'icon' => 'fa-calendar-check',   'label' => 'Rendez-vous',   'module' => 'rdv'],
             ['key' => 'consultations', 'href' => 'consultations/',            'icon' => 'fa-stethoscope',      'label' => 'Consultations', 'module' => 'consultations'],
             ['key' => 'laboratoire','href' => 'laboratoire/',                 'icon' => 'fa-flask',            'label' => 'Laboratoire',   'module' => 'laboratoire'],
+            ['key' => 'pharmacie',  'href' => 'pharmacie/',                   'icon' => 'fa-pills',            'label' => 'Pharmacie',     'module' => 'pharmacie'],
+            ['sep' => true],
+            // Caisse, comptabilité & assurances
             ['key' => 'paiements',  'href' => 'paiements/',                   'icon' => 'fa-credit-card',      'label' => 'Paiements',     'module' => 'paiements'],
+            ['key' => 'finances',   'href' => 'finances/',                    'icon' => 'fa-calculator',       'label' => 'Finances',      'module' => 'finances'],
+            ['key' => 'assurances', 'href' => 'assurances/',                  'icon' => 'fa-file-contract',    'label' => 'Assurances',    'module' => 'assurances'],
+            ['sep' => true],
+            // Équipe & ressources humaines
+            ['key' => 'medecins',   'href' => 'medecins/',                    'icon' => 'fa-user-md',          'label' => 'Médecins',      'module' => 'medecins'],
+            ['key' => 'personnel',  'href' => 'personnel/',                   'icon' => 'fa-user-tie',         'label' => 'Personnel',     'module' => 'personnel'],
+            ['sep' => true],
+            // Communication & technique
+            ['key' => 'communication', 'href' => 'communication/',            'icon' => 'fa-comments',         'label' => 'Communication', 'module' => 'communication', 'badge' => $messagesNonLus],
+            ['key' => 'maintenance','href' => 'maintenance/',                 'icon' => 'fa-tools',            'label' => 'Maintenance',   'module' => 'maintenance'],
+            ['sep' => true],
+            // Administration établissement
+            ['key' => 'guide',      'href' => 'parametres/guide_utilisateurs.php', 'icon' => 'fa-book',        'label' => 'Guide',         'roles' => null],
             ['key' => 'utilisateurs','href' => 'parametres/utilisateurs.php','icon' => 'fa-users',            'label' => 'Utilisateurs',  'module' => 'parametres', 'admin_only' => true],
             ['key' => 'droits',     'href' => 'parametres/droits_acces.php', 'icon' => 'fa-shield-alt',       'label' => 'Droits d\'accès', 'module' => 'parametres', 'admin_only' => true],
             ['key' => 'parametres', 'href' => 'parametres/',                  'icon' => 'fa-cog',              'label' => 'Paramètres',    'module' => 'parametres', 'admin_only' => true],
-            ['sep' => true],
-            ['key' => 'personnel',  'href' => 'personnel/',                   'icon' => 'fa-user-tie',         'label' => 'Personnel',     'module' => 'personnel'],
-            ['key' => 'pharmacie',  'href' => 'pharmacie/',                   'icon' => 'fa-pills',            'label' => 'Pharmacie',     'module' => 'pharmacie'],
-            ['key' => 'finances',   'href' => 'finances/',                    'icon' => 'fa-calculator',       'label' => 'Finances',      'module' => 'finances'],
-            ['key' => 'assurances', 'href' => 'assurances/',                  'icon' => 'fa-shield-alt',       'label' => 'Assurances',    'module' => 'assurances'],
-            ['key' => 'communication', 'href' => 'communication/',            'icon' => 'fa-comments',         'label' => 'Communication', 'module' => 'communication', 'badge' => $messagesNonLus],
-            ['key' => 'maintenance','href' => 'maintenance/',                 'icon' => 'fa-tools',            'label' => 'Maintenance',   'module' => 'maintenance'],
         ];
 
         if (function_exists('saas_is_platform_admin') && saas_is_platform_admin()) {
@@ -170,6 +168,7 @@ if (!function_exists('app_url')) {
             'assets/css/dashboard-enhanced.css',
             'assets/css/app-shell.css',
             'assets/css/app-module.css',
+            'assets/css/app-buttons.css',
         ], $extraCss);
         if (!defined('IS_MOBILE_LAYOUT') || !IS_MOBILE_LAYOUT) {
             array_unshift($cssFiles, 'assets/css/wptouch-inspired.css');

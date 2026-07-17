@@ -1,6 +1,6 @@
 export const API_BASE =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ||
-  (typeof window !== 'undefined' ? `${window.location.origin}` : '') + '/efficasante';
+  (typeof window !== 'undefined' ? window.location.origin : '');
 
 export const REST_URL = `${API_BASE}/api/rest/index.php`;
 

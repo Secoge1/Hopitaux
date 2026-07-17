@@ -29,29 +29,29 @@ if (!$patient) {
     exit();
 }
 
-// Calculer l'�ge
+// Calculer l'âge
 $age = $patientModel->calculateAge($patient['date_naissance']);
 
-// R�cup�rer la derni�re consultation
+// Récupérer la dernière consultation
 $consultations = $consultationModel->getPatientHistory($id, 1);
 
-// R�cup�rer les contrats d'assurance du patient
+// Récupérer les contrats d'assurance du patient
 $contratsAssurance = $assuranceModel->getContratsByPatient($id);
 
 app_module_page_start([
     'active'    => 'patients',
-    'title'     => 'D�tails du Patient',
-    'subtitle'  => htmlspecialchars($patient['prenom'] . ' ' . $patient['nom']) . ' � Dossier ' . htmlspecialchars($patient['numero_dossier']),
+    'title'     => 'Détails du Patient',
+    'subtitle'  => htmlspecialchars($patient['prenom'] . ' ' . $patient['nom']) . ' — Dossier ' . htmlspecialchars($patient['numero_dossier']),
     'icon'      => 'fa-user-injured',
     'extra_css' => ['assets/css/app-patients.css'],
 ]);
-app_module_back_toolbar(app_url('patients/index.php'), 'Retour � la liste', [
+app_module_back_toolbar(app_url('patients/index.php'), 'Retour à la liste', [
     ['href' => app_url('patients/modifier.php?id=' . $patient['id']), 'label' => 'Modifier', 'icon' => 'fa-edit', 'class' => 'btn-warning'],
 ]);
 app_module_flash();
 ?>
 
-        <!-- En-t�te du patient -->
+        <!-- En-tête du patient -->
         <div class="card patient-header text-white mb-4">
             <div class="card-body">
                 <div class="row align-items-center">
@@ -61,8 +61,8 @@ app_module_flash();
                             <?php echo htmlspecialchars($patient['prenom'] . ' ' . $patient['nom']); ?>
                         </h2>
                         <p class="mb-0">
-                            <strong>Num�ro de dossier :</strong> <?php echo htmlspecialchars($patient['numero_dossier']); ?> |
-                            <strong>�ge :</strong> <?php echo $age ? $age . ' ans' : 'N/A'; ?> |
+                            <strong>Numéro de dossier :</strong> <?php echo htmlspecialchars($patient['numero_dossier']); ?> |
+                            <strong>Âge :</strong> <?php echo $age ? $age . ' ans' : 'N/A'; ?> |
                             <strong>Genre :</strong> <?php echo ($patient['sexe'] ?? '') === 'M' ? 'Homme' : 'Femme'; ?>
                         </p>
                     </div>
@@ -85,11 +85,11 @@ app_module_flash();
                             </div>
                             <div class="col-md-6 mb-3">
                                 <strong>Groupe sanguin :</strong><br>
-                                <span class="badge bg-danger"><?php echo $patient['groupe_sanguin'] ?: 'Non renseign�'; ?></span>
+                                <span class="badge bg-danger"><?php echo $patient['groupe_sanguin'] ?: 'Non renseigné'; ?></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <strong>Profession :</strong><br>
-                                <span class="text-muted"><?php echo $patient['profession'] ?: 'Non renseign�e'; ?></span>
+                                <span class="text-muted"><?php echo $patient['profession'] ?: 'Non renseignée'; ?></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <strong>Statut :</strong><br>
@@ -101,20 +101,20 @@ app_module_flash();
                     </div>
                 </div>
 
-                <!-- Coordonn�es -->
+                <!-- Coordonnées -->
                 <div class="card mb-4">
                     <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-address-book me-2"></i>Coordonn�es</h5>
+                        <h5 class="mb-0"><i class="fas fa-address-book me-2"></i>Coordonnées</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <strong>T�l�phone :</strong><br>
-                                <span class="text-primary"><?php echo $patient['telephone'] ?: 'Non renseign�'; ?></span>
+                                <strong>Téléphone :</strong><br>
+                                <span class="text-primary"><?php echo $patient['telephone'] ?: 'Non renseigné'; ?></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <strong>Email :</strong><br>
-                                <span class="text-primary"><?php echo $patient['email'] ?: 'Non renseign�'; ?></span>
+                                <span class="text-primary"><?php echo $patient['email'] ?: 'Non renseigné'; ?></span>
                             </div>
                             <div class="col-12 mb-3">
                                 <strong>Adresse :</strong><br>
@@ -124,7 +124,7 @@ app_module_flash();
                                         <?php echo htmlspecialchars($patient['code_postal'] . ' ' . $patient['ville']); ?><br>
                                         <?php echo htmlspecialchars($patient['pays']); ?>
                                     <?php else: ?>
-                                        Non renseign�e
+                                        Non renseignée
                                     <?php endif; ?>
                                 </span>
                             </div>
@@ -132,16 +132,16 @@ app_module_flash();
                     </div>
                 </div>
 
-                <!-- Informations m�dicales -->
+                <!-- Informations médicales -->
                 <div class="card mb-4">
                     <div class="card-header bg-warning text-white">
-                        <h5 class="mb-0"><i class="fas fa-notes-medical me-2"></i>Informations M�dicales</h5>
+                        <h5 class="mb-0"><i class="fas fa-notes-medical me-2"></i>Informations Médicales</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 mb-3">
-                                <strong>Ant�c�dents m�dicaux :</strong><br>
-                                <span class="text-muted"><?php echo $patient['antecedents_medicaux'] ? nl2br(htmlspecialchars($patient['antecedents_medicaux'])) : 'Aucun ant�c�dent renseign�'; ?></span>
+                                <strong>Antécédents médicaux :</strong><br>
+                                <span class="text-muted"><?php echo $patient['antecedents_medicaux'] ? nl2br(htmlspecialchars($patient['antecedents_medicaux'])) : 'Aucun antécédent renseigné'; ?></span>
                             </div>
                             <div class="col-12 mb-3">
                                 <strong>Allergies :</strong><br>
@@ -175,17 +175,17 @@ app_module_flash();
                                             <span class="text-primary fw-bold"><?php echo htmlspecialchars($contrat['assurance_nom']); ?></span>
                                         </div>
                                         <div class="col-md-6 mb-2">
-                                            <strong><i class="fas fa-file-contract me-2 text-info"></i>Num�ro de contrat :</strong><br>
+                                            <strong><i class="fas fa-file-contract me-2 text-info"></i>Numéro de contrat :</strong><br>
                                             <span class="badge bg-info"><?php echo htmlspecialchars($contrat['numero_contrat']); ?></span>
                                         </div>
                                         <?php if ($contrat['numero_police']): ?>
                                         <div class="col-md-6 mb-2">
-                                            <strong><i class="fas fa-id-card me-2 text-secondary"></i>Num�ro de police :</strong><br>
+                                            <strong><i class="fas fa-id-card me-2 text-secondary"></i>Numéro de police :</strong><br>
                                             <span><?php echo htmlspecialchars($contrat['numero_police']); ?></span>
                                         </div>
                                         <?php endif; ?>
                                         <div class="col-md-6 mb-2">
-                                            <strong><i class="fas fa-calendar me-2 text-success"></i>P�riode :</strong><br>
+                                            <strong><i class="fas fa-calendar me-2 text-success"></i>Période :</strong><br>
                                             <small class="text-muted">
                                                 Du <?php echo date('d/m/Y', strtotime($contrat['date_debut'])); ?>
                                                 <?php if ($contrat['date_fin']): ?>
@@ -219,7 +219,7 @@ app_module_flash();
                                     <i class="fas fa-plus me-2"></i>Ajouter un contrat
                                 </a>
                                 <a href="../assurances/index.php?patient_id=<?php echo $patient['id']; ?>" class="btn btn-sm btn-info">
-                                    <i class="fas fa-cog me-2"></i>G�rer les contrats
+                                    <i class="fas fa-cog me-2"></i>Gérer les contrats
                                 </a>
                             </div>
                         <?php endif; ?>
@@ -231,7 +231,7 @@ app_module_flash();
                 <?php if ($canAssignMedecin): ?>
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>M�decin r�f�rent</h6>
+                        <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>Médecin référent</h6>
                     </div>
                     <div class="card-body">
                         <?php if (!empty($patient['medecin_referent_id'])): ?>
@@ -242,14 +242,14 @@ app_module_flash();
                             <?php endif; ?>
                         </p>
                         <?php else: ?>
-                        <p class="text-muted mb-2">Aucun m�decin assign�</p>
+                        <p class="text-muted mb-2">Aucun médecin assigné</p>
                         <?php endif; ?>
                         <form method="POST" action="assigner_medecin.php" class="row g-2">
                             <input type="hidden" name="patient_id" value="<?= (int) $patient['id'] ?>">
                             <input type="hidden" name="redirect" value="voir.php?id=<?= (int) $patient['id'] ?>">
                             <div class="col-12">
                                 <select class="form-select form-select-sm" name="medecin_referent_id">
-                                    <option value="">� Retirer l'assignation �</option>
+                                    <option value="">— Retirer l'assignation —</option>
                                     <?php foreach ($medecins as $m): ?>
                                     <option value="<?= (int) $m['id'] ?>" <?= (int) $m['id'] === (int) ($patient['medecin_referent_id'] ?? 0) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars(medecin_profil_format_name($m)) ?>
@@ -259,7 +259,7 @@ app_module_flash();
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-sm btn-primary w-100">
-                                    <i class="fas fa-user-check me-1"></i>Assigner le m�decin
+                                    <i class="fas fa-user-check me-1"></i>Assigner le médecin
                                 </button>
                             </div>
                         </form>
@@ -268,7 +268,7 @@ app_module_flash();
                 <?php elseif (!empty($patient['medecin_referent_id'])): ?>
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>M�decin r�f�rent</h6>
+                        <h6 class="mb-0"><i class="fas fa-user-md me-2"></i>Médecin référent</h6>
                     </div>
                     <div class="card-body">
                         <strong><?= htmlspecialchars(medecin_profil_format_joined($patient, 'medecin_referent')) ?></strong>
@@ -298,10 +298,10 @@ app_module_flash();
                                 <i class="fas fa-calendar-plus me-2"></i>Nouveau Rendez-vous
                             </a>
                             <a href="generer_dossier_pdf.php?patient_id=<?php echo $patient['id']; ?>" class="btn btn-secondary" target="_blank">
-                                <i class="fas fa-print me-2"></i>Imprimer Dossier M�dical
+                                <i class="fas fa-print me-2"></i>Imprimer Dossier Médical
                             </a>
                             <a href="gerer_documents.php?patient_id=<?php echo $patient['id']; ?>" class="btn btn-success">
-                                <i class="fas fa-notes-medical me-2"></i>G�rer Documents
+                                <i class="fas fa-notes-medical me-2"></i>Gérer Documents
                             </a>
                             <div class="dropdown">
                                 <button class="btn btn-success dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -309,7 +309,7 @@ app_module_flash();
                                 </button>
                                 <ul class="dropdown-menu w-100">
                                     <li><a class="dropdown-item" href="gerer_documents.php?patient_id=<?php echo $patient['id']; ?>&categorie=photos_medicales">
-                                        <i class="fas fa-camera me-2"></i>Photos M�dicales
+                                        <i class="fas fa-camera me-2"></i>Photos Médicales
                                     </a></li>
                                     <li><a class="dropdown-item" href="gerer_documents.php?patient_id=<?php echo $patient['id']; ?>&categorie=rapports">
                                         <i class="fas fa-file-medical me-2"></i>Rapports
@@ -321,7 +321,7 @@ app_module_flash();
                                         <i class="fas fa-prescription me-2"></i>Ordonnances
                                     </a></li>
                                     <li><a class="dropdown-item" href="gerer_documents.php?patient_id=<?php echo $patient['id']; ?>&categorie=certificats">
-                                        <i class="fas fa-certificate me-2"></i>Certificats M�dicaux
+                                        <i class="fas fa-certificate me-2"></i>Certificats Médicaux
                                     </a></li>
                                     <li><a class="dropdown-item" href="gerer_documents.php?patient_id=<?php echo $patient['id']; ?>&categorie=autres">
                                         <i class="fas fa-file me-2"></i>Autres Documents
@@ -346,29 +346,29 @@ app_module_flash();
                     </div>
                     <div class="card-body">
                         <div class="info-card p-3 mb-3">
-                            <strong>Date de cr�ation :</strong><br>
+                            <strong>Date de création :</strong><br>
                             <small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($patient['date_creation'])); ?></small>
                         </div>
                         <?php if ($patient['date_modification']): ?>
                         <div class="info-card p-3">
-                            <strong>Derni�re modification :</strong><br>
+                            <strong>Dernière modification :</strong><br>
                             <small class="text-muted"><?php echo date('d/m/Y H:i', strtotime($patient['date_modification'])); ?></small>
                         </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Derni�re consultation -->
+                <!-- Dernière consultation -->
                 <div class="card">
                     <div class="card-header bg-info text-white">
-                        <h6 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Derni�re Consultation</h6>
+                        <h6 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Dernière Consultation</h6>
                     </div>
                     <div class="card-body">
                         <?php if (empty($consultations)): ?>
-                            <p class="text-muted mb-0">Aucune consultation trouv�e</p>
+                            <p class="text-muted mb-0">Aucune consultation trouvée</p>
                             <div class="text-center mt-3">
                                 <a href="../consultations/ajouter.php?patient_id=<?php echo $patient['id']; ?>" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-plus me-2"></i>Cr�er une consultation
+                                    <i class="fas fa-plus me-2"></i>Créer une consultation
                                 </a>
                             </div>
                         <?php else: ?>
@@ -406,7 +406,7 @@ app_module_flash();
                                     <i class="fas fa-print me-2"></i>Ticket A4
                                 </a>
                                 <a href="../consultations/voir.php?id=<?php echo $consultation['id']; ?>" class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-eye me-2"></i>Voir les d�tails
+                                    <i class="fas fa-eye me-2"></i>Voir les détails
                                 </a>
                                 <a href="../consultations/?patient_id=<?php echo $patient['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-history me-2"></i>Voir tout l'historique
@@ -428,7 +428,7 @@ app_module_flash();
                     <i class="fas fa-stethoscope me-2"></i>Nouvelle Consultation
                 </a>
                 <a href="index.php" class="btn btn-outline-secondary btn-lg">
-                    <i class="fas fa-arrow-left me-2"></i>Retour � la liste
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
                 </a>
             </div>
         </div>

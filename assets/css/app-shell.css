@@ -14,6 +14,19 @@
     --app-topbar-h: 60px;
     --app-gradient: linear-gradient(135deg, var(--app-primary-dark) 0%, var(--app-primary) 55%, var(--app-teal) 100%);
     --app-sidebar-gradient: linear-gradient(180deg, var(--app-primary-deep) 0%, var(--app-primary-dark) 45%, #1a6b8a 100%);
+    /* Boutons — palette unique */
+    --app-danger: #dc2626;
+    --app-danger-hover: #b91c1c;
+    --btn-radius: 10px;
+    --btn-shadow: 0 2px 8px rgba(27, 79, 155, 0.2);
+    --btn-shadow-hover: 0 4px 12px rgba(27, 79, 155, 0.28);
+    --btn-danger-shadow: 0 2px 8px rgba(220, 38, 38, 0.22);
+    /* Alias gradients (écrase dashboard-enhanced / modern-design) */
+    --primary-gradient: var(--app-gradient);
+    --success-gradient: var(--app-gradient);
+    --info-gradient: var(--app-gradient);
+    --warning-gradient: var(--app-gradient);
+    --danger-gradient: linear-gradient(135deg, var(--app-danger) 0%, #ef4444 100%);
 }
 
 body.app-shell {

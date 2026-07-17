@@ -19,6 +19,8 @@ class PlatformTenantFeatures
     public const PATIENT_PORTAL = 'patient_portal';
     public const INSURANCE_TPA = 'insurance_tpa';
     public const PHARMACY_ADVANCED = 'pharmacy_advanced';
+    /** ERP pharmacie premium indépendant (PharmaPro) — add-on commercial activé par admin. */
+    public const PHARMA_ERP_SUITE = 'pharma_erp_suite';
     public const NOTIFICATION_CENTER = 'notification_center';
     public const REST_API_V2 = 'rest_api_v2';
     public const AI_MEDICAL_SUITE = 'ai_medical_suite';
@@ -32,6 +34,7 @@ class PlatformTenantFeatures
         self::PATIENT_PORTAL => 'planned',
         self::INSURANCE_TPA => 'planned',
         self::PHARMACY_ADVANCED => 'planned',
+        self::PHARMA_ERP_SUITE => 'live',
         self::NOTIFICATION_CENTER => 'planned',
         self::REST_API_V2 => 'beta',
         self::AI_MEDICAL_SUITE => 'beta',
@@ -46,6 +49,7 @@ class PlatformTenantFeatures
         self::PATIENT_PORTAL => 'Portail patient sécurisé',
         self::INSURANCE_TPA => 'Assurances & mutuelles (tiers payant)',
         self::PHARMACY_ADVANCED => 'Pharmacie avancée (lots, inventaires)',
+        self::PHARMA_ERP_SUITE => 'PharmaPro ERP — Gestion pharmacie premium',
         self::NOTIFICATION_CENTER => 'Centre de notifications unifié',
         self::REST_API_V2 => 'API REST mobile (v2 étendue)',
         self::AI_MEDICAL_SUITE => 'Suite IA médicale (Mistral)',
@@ -60,6 +64,7 @@ class PlatformTenantFeatures
         self::PATIENT_PORTAL => 'Espace patient : historique, téléchargements, RDV, paiements.',
         self::INSURANCE_TPA => 'CANAM, AMO, mutuelles : taux, plafonds, reste à charge, créances et remboursements.',
         self::PHARMACY_ADVANCED => 'Lots, péremption, alertes rupture, inventaires, valorisation stock, mouvements.',
+        self::PHARMA_ERP_SUITE => 'ERP pharmacie complet : POS, lots, achats, SYSCOHADA, multi-caisses, fidélité, API. Module indépendant activé par abonnement.',
         self::NOTIFICATION_CENTER => 'Alertes RDV, résultats labo, stocks, factures impayées, créances assurance.',
         self::REST_API_V2 => 'API REST étendue pour apps médecin, patient, caisse et laboratoire.',
         self::AI_MEDICAL_SUITE => 'Suggestions diagnostics, enrichissement analyses, résumés consultation (sans diagnostic auto).',

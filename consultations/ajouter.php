@@ -9,6 +9,7 @@ require_once __DIR__ . '/../models/Medecin.php';
 require_once __DIR__ . '/../models/TarifConsultation.php';
 require_once __DIR__ . '/../models/CategorieHospitalisation.php';
 require_once __DIR__ . '/../models/SoinsConsultation.php';
+require_once __DIR__ . '/../includes/consultation_types.php';
 
 $consultationModel = new Consultation();
 $patientModel = new Patient();
@@ -26,7 +27,11 @@ $selectedPatientId = isset($_GET['patient_id']) ? (int)$_GET['patient_id'] : '';
 // Récupérer la liste des patients et médecins
 $patients = $patientModel->getAll(1, 1000); // Tous les patients
 $medecins = $medecinModel->getAll(1, 1000); // Tous les médecins
-$tarifs = $tarifModel->getAll(); // Tous les tarifs
+$tarifs = $tarifModel->getAll('actif'); // Tarifs actifs (paramètres)
+$typesConsultation = consultation_types_for_form($tarifModel);
+$defaultTypeConsultation = $typesConsultation[0] ?? 'normale';
+$defaultTarif = $tarifModel->getByTypeAndSpecialite($defaultTypeConsultation, null);
+$defaultPrixConsultation = $defaultTarif ? (float) $defaultTarif['prix'] : 5000.0;
 $categories = $categorieModel->getAll(); // Toutes les catégories d'hospitalisation
 $soins = $soinsModel->getAll('actif'); // Tous les soins actifs
 
@@ -34,19 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $date_consultation = $_POST['date_consultation'];
 
-        $typePost = (string) ($_POST['type_consultation'] ?? 'consultation_simple');
-        if ($typePost === '__autre__') {
-            $typeAutre = trim((string) ($_POST['type_consultation_autre'] ?? ''));
-            if ($typeAutre === '') {
-                throw new Exception('Veuillez préciser le type de consultation lorsque « Autre (préciser) » est sélectionné.');
-            }
-            $typeConsultation = preg_replace('/\s+/', '_', mb_strtolower($typeAutre, 'UTF-8'));
-        } elseif (in_array($typePost, ['consultation_simple', 'consultation_specialisee', 'urgence', 'controle'], true)) {
-            $typeConsultation = $typePost;
-        } else {
-            $typeConsultation = 'consultation_simple';
-        }
-        
+        $typeConsultation = consultation_type_resolve_from_post($_POST, $typesConsultation);
         $data = [
             'patient_id' => $_POST['patient_id'],
             'medecin_id' => $_POST['medecin_id'],
@@ -216,6 +209,29 @@ app_module_flash();
         .medication-filtered { background: #f8f9fa; border: 1px dashed #6c757d; color: #6c757d; text-decoration: line-through; opacity: 0.6; }
         .medication-warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
         .medication-contraindicated { background: #f8d7da; border: 1px solid #dc3545; color: #721c24; }
+        .consultation-form-panel {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(15, 41, 66, 0.06);
+            overflow: hidden;
+        }
+        .consultation-form-panel .card-header {
+            padding: 0.85rem 1.1rem;
+            border-bottom: none;
+        }
+        .consultation-form-panel .card-header h6 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .consultation-form-panel .card-body {
+            padding: 1.1rem;
+        }
+        .consultation-form-panel .form-check-input { cursor: pointer; }
+        .consultation-form-panel .form-check-label { cursor: pointer; }
+        .consultation-form-panel-total {
+            font-size: 0.95rem;
+            padding-top: 0.35rem;
+        }
 </style>
 
         <?php if ($message): ?>
@@ -282,12 +298,15 @@ app_module_flash();
                     <div class="col-md-6">
                         <label for="type_consultation" class="form-label">Type de consultation *</label>
                         <select class="form-select" id="type_consultation" name="type_consultation" required>
-                            <option value="consultation_simple">Consultation simple</option>
-                            <option value="consultation_specialisee">Consultation spécialisée</option>
-                            <option value="urgence">Urgence</option>
-                            <option value="controle">Contrôle</option>
+                            <?php foreach ($typesConsultation as $typeKey): ?>
+                                <option value="<?php echo htmlspecialchars($typeKey, ENT_QUOTES, 'UTF-8'); ?>"
+                                    <?php echo $typeKey === $defaultTypeConsultation ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars(consultation_type_label($typeKey)); ?>
+                                </option>
+                            <?php endforeach; ?>
                             <option value="__autre__">Autre (préciser)</option>
                         </select>
+                        <div class="form-text">Types issus des tarifs configurés dans Paramètres → Tarifs</div>
                         <div class="mt-2" id="wrap_type_consultation_autre" style="display: none;">
                             <label for="type_consultation_autre" class="form-label">Précisez le type *</label>
                             <input type="text" class="form-control" id="type_consultation_autre" name="type_consultation_autre"
@@ -298,58 +317,58 @@ app_module_flash();
                     <div class="col-md-6">
                         <label for="prix_consultation" class="form-label">Prix de la consultation (<?= htmlspecialchars(function_exists('app_currency_label') ? app_currency_label() : 'FCFA') ?>) *</label>
                         <input type="number" class="form-control" id="prix_consultation" name="prix_consultation" 
-                               step="0.01" min="0" value="5000.00" required>
+                               step="0.01" min="0" value="<?php echo htmlspecialchars(number_format($defaultPrixConsultation, 2, '.', ''), ENT_QUOTES, 'UTF-8'); ?>" required>
                         <div class="form-text">Le prix sera automatiquement calculé selon le type de consultation</div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="hospitalisation_requise" name="hospitalisation_requise">
-                            <label class="form-check-label" for="hospitalisation_requise">
-                                Hospitalisation requise
-                            </label>
-                        </div>
-                        <div class="form-text">Cochez si le patient nécessite une hospitalisation</div>
-                    </div>
-
-                    <!-- Section Hospitalisation (affichée conditionnellement) -->
-                    <div class="col-12" id="hospitalisation-section" style="display: none;">
-                        <div class="card mt-3">
+                    <!-- Hospitalisation (même structure que Soins de Consultation) -->
+                    <div class="col-12">
+                        <div class="card mt-3 consultation-form-panel">
                             <div class="card-header bg-info text-white">
-                                <h6 class="mb-0"><i class="fas fa-bed me-2"></i>Détails de l'Hospitalisation</h6>
+                                <h6 class="mb-0"><i class="fas fa-bed me-2"></i>Hospitalisation</h6>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="categorie_hospitalisation" class="form-label">Catégorie d'hospitalisation</label>
-                                        <select class="form-select" id="categorie_hospitalisation" name="categorie_hospitalisation">
-                                            <option value="">Sélectionner une catégorie</option>
-                                            <?php foreach ($categories as $categorie): ?>
-                                                <option value="<?php echo $categorie['id']; ?>" 
-                                                        data-prix="<?php echo $categorie['prix_jour']; ?>">
-                                                    <?php echo htmlspecialchars($categorie['nom']); ?> - 
-                                                    <?= htmlspecialchars(formatMoney($categorie['prix_jour'])) ?>/jour
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="duree_hospitalisation" class="form-label">Durée prévue (jours)</label>
-                                        <input type="number" class="form-control" id="duree_hospitalisation" name="duree_hospitalisation" 
-                                               min="1" value="1">
-                                    </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                           id="hospitalisation_requise" name="hospitalisation_requise">
+                                    <label class="form-check-label fw-semibold" for="hospitalisation_requise">
+                                        Hospitalisation requise
+                                    </label>
                                 </div>
-                                <div class="row mt-3">
-                                    <div class="col-12">
-                                        <label for="notes_hospitalisation" class="form-label">Notes sur l'hospitalisation</label>
-                                        <textarea class="form-control" id="notes_hospitalisation" name="notes_hospitalisation" rows="2"
-                                                  placeholder="Notes spécifiques sur l'hospitalisation..."></textarea>
+                                <p class="form-text mt-n2 mb-3">Cochez si le patient nécessite une hospitalisation</p>
+
+                                <div id="hospitalisation-section" style="display: none;">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-6">
+                                            <label for="categorie_hospitalisation" class="form-label">Catégorie d'hospitalisation</label>
+                                            <select class="form-select" id="categorie_hospitalisation" name="categorie_hospitalisation">
+                                                <option value="">Sélectionner une catégorie...</option>
+                                                <?php foreach ($categories as $categorie): ?>
+                                                    <option value="<?php echo $categorie['id']; ?>"
+                                                            data-prix="<?php echo $categorie['prix_jour']; ?>">
+                                                        <?php echo htmlspecialchars($categorie['nom']); ?> —
+                                                        <?= htmlspecialchars(formatMoney($categorie['prix_jour'])) ?>/jour
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="duree_hospitalisation" class="form-label">Durée (jours)</label>
+                                            <input type="number" class="form-control" id="duree_hospitalisation" name="duree_hospitalisation"
+                                                   min="1" value="1">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="consultation-form-panel-total text-info">
+                                                <strong>Total estimé :</strong>
+                                                <span id="prix-total-hospitalisation"><?= htmlspecialchars(formatMoney(0)) ?></span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-12">
-                                        <div class="alert alert-info">
-                                            <strong>Prix total estimé :</strong> <span id="prix-total-hospitalisation"><?= htmlspecialchars(formatMoney(0)) ?></span>
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <label for="notes_hospitalisation" class="form-label">Notes sur l'hospitalisation</label>
+                                            <textarea class="form-control" id="notes_hospitalisation" name="notes_hospitalisation" rows="2"
+                                                      placeholder="Notes spécifiques sur l'hospitalisation..."></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -357,14 +376,14 @@ app_module_flash();
                         </div>
                     </div>
 
-                    <!-- Section Soins -->
+                    <!-- Soins de Consultation -->
                     <div class="col-12">
-                        <div class="card mt-3">
+                        <div class="card mt-3 consultation-form-panel">
                             <div class="card-header bg-success text-white">
                                 <h6 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Soins de Consultation</h6>
                             </div>
                             <div class="card-body">
-                                <div class="row">
+                                <div class="row g-3 align-items-end">
                                     <div class="col-md-6">
                                         <label for="soin_id" class="form-label">Ajouter un soin</label>
                                         <select class="form-select" id="soin_id" name="soin_id">
@@ -390,13 +409,13 @@ app_module_flash();
                                         </button>
                                     </div>
                                 </div>
-                                
-                                <!-- Liste des soins ajoutés -->
+
                                 <div id="soins-list" class="mt-3" style="display: none;">
-                                    <h6>Soins sélectionnés :</h6>
+                                    <h6 class="mb-2">Soins sélectionnés :</h6>
                                     <div id="soins-items"></div>
-                                    <div class="mt-2">
-                                        <strong>Total des soins : <span id="total-soins" class="text-success"><?= htmlspecialchars(formatMoney(0)) ?></span></strong>
+                                    <div class="consultation-form-panel-total mt-2 text-success">
+                                        <strong>Total des soins :</strong>
+                                        <span id="total-soins"><?= htmlspecialchars(formatMoney(0)) ?></span>
                                     </div>
                                 </div>
                                 
@@ -1241,29 +1260,41 @@ app_module_flash();
             const categorieSelect = document.getElementById('categorie_hospitalisation');
             const dureeInput = document.getElementById('duree_hospitalisation');
             const prixTotalSpan = document.getElementById('prix-total-hospitalisation');
-            
-            // Afficher/masquer la section hospitalisation
-            hospitalisationCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    hospitalisationSection.style.display = 'block';
-                } else {
-                    hospitalisationSection.style.display = 'none';
-                }
-            });
-            
-            // Calcul automatique du prix total d'hospitalisation
+
             function calculerPrixHospitalisation() {
+                if (!categorieSelect || !dureeInput || !prixTotalSpan) {
+                    return;
+                }
                 const categorie = categorieSelect.options[categorieSelect.selectedIndex];
                 const prixJour = parseFloat(categorie.dataset.prix) || 0;
-                const duree = parseInt(dureeInput.value) || 1;
+                const duree = parseInt(dureeInput.value, 10) || 1;
                 const prixTotal = prixJour * duree;
                 prixTotalSpan.textContent = typeof appFormatMoney === 'function'
                     ? appFormatMoney(prixTotal)
                     : prixTotal.toLocaleString('fr-FR') + ' FCFA';
             }
-            
-            categorieSelect.addEventListener('change', calculerPrixHospitalisation);
-            dureeInput.addEventListener('input', calculerPrixHospitalisation);
+
+            function toggleHospitalisationSection() {
+                if (!hospitalisationCheckbox || !hospitalisationSection) {
+                    return;
+                }
+                hospitalisationSection.style.display = hospitalisationCheckbox.checked ? 'block' : 'none';
+                if (hospitalisationCheckbox.checked) {
+                    calculerPrixHospitalisation();
+                }
+            }
+
+            if (hospitalisationCheckbox) {
+                hospitalisationCheckbox.addEventListener('change', toggleHospitalisationSection);
+                toggleHospitalisationSection();
+            }
+
+            if (categorieSelect) {
+                categorieSelect.addEventListener('change', calculerPrixHospitalisation);
+            }
+            if (dureeInput) {
+                dureeInput.addEventListener('input', calculerPrixHospitalisation);
+            }
             
             // Calcul automatique du prix selon le type de consultation
             const typeConsultationSelect = document.getElementById('type_consultation');
@@ -1292,13 +1323,16 @@ app_module_flash();
                 if (type === '__autre__') {
                     return;
                 }
-                const tarif = tarifs.find(t => t.type_consultation === type);
+                const tarif = tarifs.find(t => t.type_consultation === type && (t.statut === 'actif' || !t.statut));
                 if (tarif) {
                     prixConsultationInput.value = parseFloat(tarif.prix).toFixed(2);
                 }
             });
 
             toggleTypeConsultationAutre();
+            if (typeConsultationSelect.value && typeConsultationSelect.value !== '__autre__') {
+                typeConsultationSelect.dispatchEvent(new Event('change'));
+            }
             
             // Gestion des soins
             let soinsSelectionnes = [];

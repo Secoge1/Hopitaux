@@ -4,12 +4,21 @@ require_once __DIR__ . '/includes/documentation_sections.php';
 require_once __DIR__ . '/includes/saas/SubscriptionPlan.php';
 
 public_init();
+
+if (defined('APP_PHARMA_HOST') && APP_PHARMA_HOST) {
+    header('Location: ' . public_url('tarifs_pharma.php'));
+    exit();
+}
+
 public_redirect_if_logged_in();
 require_once __DIR__ . '/includes/home_images.php';
 
 $moduleCount = doc_module_count();
 
-public_head('Accueil — ' . platform_name(), 'pub-home');
+public_head('Accueil — ' . platform_name(), 'pub-home', [], [
+    'description' => 'Logiciel de gestion clinique SaaS pour hôpitaux et centres de santé. Patients, consultations, laboratoire, paiements Mobile Money. Essai gratuit 15 jours.',
+    'keywords' => 'logiciel médical Mali, gestion clinique Afrique, hôpital numérique, patients consultations, laboratoire médical, Mobile Money Orange Wave, SaaS santé',
+]);
 public_nav('home');
 ?>
 
@@ -45,7 +54,7 @@ public_nav('home');
                  onerror="this.onerror=null;this.src='<?= htmlspecialchars(home_banner_fallback(2), ENT_QUOTES) ?>'">
             <div class="carousel-caption">
                 <h1>Dossiers patients &amp; consultations</h1>
-                <p>Suivi médical complet, hospitalisation, pharmacie et paiements intégrés pour une clinique efficace.</p>
+                <p>Suivi médical complet, hospitalisation, pharmacie, PharmaPro ERP (officine) et paiements intégrés pour une clinique efficace.</p>
                 <div class="pub-hero-actions">
                     <a href="#services" class="pub-hero-btn pub-hero-btn-light">
                         <i class="fas fa-th-large"></i> Fonctionnalités

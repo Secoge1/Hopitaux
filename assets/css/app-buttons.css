@@ -1,0 +1,214 @@
+/* SeSanté — boutons uniformisés (espace connecté)
+   Palette : primaire (bleu-teal) · neutre · danger (rouge) */
+
+body.app-shell .btn {
+    border-radius: var(--btn-radius, 10px);
+    font-weight: 600;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+        box-shadow 0.15s ease, transform 0.12s ease, filter 0.15s ease;
+}
+
+/* Désactive les effets « shimmer » hérités de dashboard-enhanced */
+body.app-shell .btn::before,
+body.app-shell .btn::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* ── Actions principales (primary, success, info, warning → même style) ── */
+body.app-shell .btn-primary,
+body.app-shell .btn-success,
+body.app-shell .btn-info,
+body.app-shell .btn-warning,
+body.app-shell .quick-actions .btn-primary,
+body.app-shell .quick-actions .btn-success,
+body.app-shell .quick-actions .btn-info,
+body.app-shell .quick-actions .btn-warning {
+    background: var(--app-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: var(--btn-shadow);
+}
+
+body.app-shell .btn-primary:hover,
+body.app-shell .btn-primary:focus,
+body.app-shell .btn-success:hover,
+body.app-shell .btn-success:focus,
+body.app-shell .btn-info:hover,
+body.app-shell .btn-info:focus,
+body.app-shell .btn-warning:hover,
+body.app-shell .btn-warning:focus,
+body.app-shell .quick-actions .btn-primary:hover,
+body.app-shell .quick-actions .btn-success:hover,
+body.app-shell .quick-actions .btn-info:hover,
+body.app-shell .quick-actions .btn-warning:hover {
+    background: var(--app-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    filter: brightness(1.06);
+    box-shadow: var(--btn-shadow-hover);
+    transform: translateY(-1px);
+}
+
+body.app-shell .btn-primary:active,
+body.app-shell .btn-success:active,
+body.app-shell .btn-info:active,
+body.app-shell .btn-warning:active {
+    filter: brightness(0.96);
+    transform: translateY(0);
+}
+
+/* ── Suppression (seul accent rouge) ── */
+body.app-shell .btn-danger,
+body.app-shell .quick-actions .btn-danger {
+    background: var(--danger-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: var(--btn-danger-shadow);
+}
+
+body.app-shell .btn-danger:hover,
+body.app-shell .btn-danger:focus,
+body.app-shell .quick-actions .btn-danger:hover {
+    background: var(--danger-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    filter: brightness(1.05);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    transform: translateY(-1px);
+}
+
+/* ── Neutres (secondaire, annuler, fermer) ── */
+body.app-shell .btn-secondary,
+body.app-shell .btn-dark {
+    background: #64748b !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: 0 1px 3px rgba(15, 41, 66, 0.12);
+}
+
+body.app-shell .btn-secondary:hover,
+body.app-shell .btn-dark:hover {
+    background: #475569 !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+body.app-shell .btn-outline-secondary,
+body.app-shell .btn-outline-dark {
+    background: #fff !important;
+    border: 1.5px solid var(--app-border) !important;
+    color: var(--app-muted) !important;
+    box-shadow: none;
+}
+
+body.app-shell .btn-outline-secondary:hover,
+body.app-shell .btn-outline-dark:hover {
+    background: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #475569 !important;
+    transform: translateY(-1px);
+}
+
+/* ── Contours (primary / success / info / warning → contour primaire) ── */
+body.app-shell .btn-outline-primary,
+body.app-shell .btn-outline-success,
+body.app-shell .btn-outline-info,
+body.app-shell .btn-outline-warning,
+body.app-shell .quick-actions .btn-outline-primary,
+body.app-shell .quick-actions .btn-outline-success,
+body.app-shell .quick-actions .btn-outline-info,
+body.app-shell .quick-actions .btn-outline-warning {
+    background: #fff !important;
+    border: 1.5px solid var(--app-primary) !important;
+    color: var(--app-primary) !important;
+    box-shadow: none;
+}
+
+body.app-shell .btn-outline-primary:hover,
+body.app-shell .btn-outline-success:hover,
+body.app-shell .btn-outline-info:hover,
+body.app-shell .btn-outline-warning:hover,
+body.app-shell .quick-actions .btn-outline-primary:hover,
+body.app-shell .quick-actions .btn-outline-success:hover,
+body.app-shell .quick-actions .btn-outline-info:hover,
+body.app-shell .quick-actions .btn-outline-warning:hover {
+    background: rgba(27, 143, 173, 0.08) !important;
+    border-color: var(--app-primary-dark) !important;
+    color: var(--app-primary-dark) !important;
+    transform: translateY(-1px);
+}
+
+body.app-shell .btn-outline-danger,
+body.app-shell .quick-actions .btn-outline-danger {
+    background: #fff !important;
+    border: 1.5px solid var(--app-danger) !important;
+    color: var(--app-danger) !important;
+    box-shadow: none;
+}
+
+body.app-shell .btn-outline-danger:hover,
+body.app-shell .quick-actions .btn-outline-danger:hover {
+    background: rgba(220, 38, 38, 0.07) !important;
+    border-color: var(--app-danger-hover) !important;
+    color: var(--app-danger-hover) !important;
+    transform: translateY(-1px);
+}
+
+/* Boutons sur en-têtes de cartes colorés */
+body.app-shell .card-header .btn-light,
+body.app-shell .bg-primary .btn-light,
+body.app-shell .bg-danger .btn-light,
+body.app-shell .bg-success .btn-light {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #fff !important;
+    box-shadow: none;
+}
+
+body.app-shell .card-header .btn-light:hover,
+body.app-shell .bg-primary .btn-light:hover,
+body.app-shell .bg-danger .btn-light:hover,
+body.app-shell .bg-success .btn-light:hover {
+    background: rgba(255, 255, 255, 0.28) !important;
+    color: #fff !important;
+}
+
+/* Groupes de boutons */
+body.app-shell .btn-group .btn {
+    box-shadow: none;
+}
+
+body.app-shell .btn-group .btn-primary,
+body.app-shell .btn-group .btn-success,
+body.app-shell .btn-group .btn-info,
+body.app-shell .btn-group .btn-warning {
+    box-shadow: none;
+}
+
+/* Tailles */
+body.app-shell .btn-sm {
+    border-radius: 8px;
+    font-size: 0.82rem;
+}
+
+body.app-shell .btn-lg {
+    border-radius: 12px;
+}
+
+/* Liens bouton */
+body.app-shell .btn-link {
+    color: var(--app-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+body.app-shell .btn-link:hover {
+    color: var(--app-primary-dark);
+}
+
+/* Bandeau sync paiements */
+body.app-shell .payment-sync-global-banner .btn-success,
+body.app-shell .payment-sync-global-banner .btn-outline-success {
+    border-radius: 8px;
+}

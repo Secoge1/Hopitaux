@@ -1,0 +1,11 @@
+{
+    "name": "efficasante/hopitaux",
+    "description": "Efficasante / Hopitaux — ERP hospitalier et PharmaPro",
+    "require": {
+        "php": ">=7.4",
+        "tecnickcom/tcpdf": "^6.7"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

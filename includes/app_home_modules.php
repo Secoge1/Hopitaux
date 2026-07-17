@@ -35,6 +35,7 @@ if (!function_exists('app_home_date_fr')) {
             ['group' => 'Administration', 'module' => 'finances', 'icon' => 'fa-calculator', 'tone' => 'violet', 'title' => 'Finances', 'desc' => 'Comptabilité et budgets.', 'href' => 'finances/', 'action' => 'finances/nouvelle_ecriture.php', 'action_label' => 'Écriture'],
             ['group' => 'Administration', 'module' => 'assurances', 'icon' => 'fa-shield-alt', 'tone' => 'cyan', 'title' => 'Assurances', 'desc' => 'Contrats et remboursements.', 'href' => 'assurances/', 'action' => 'assurances/ajouter.php', 'action_label' => 'Contrat'],
             ['group' => 'Logistique', 'module' => 'pharmacie', 'icon' => 'fa-pills', 'tone' => 'teal', 'title' => 'Pharmacie', 'desc' => 'Stocks, commandes et péremption.', 'href' => 'pharmacie/', 'action' => 'pharmacie/ajouter.php', 'action_label' => 'Stock'],
+            ['group' => 'Logistique', 'module' => 'pharma_erp', 'feature' => 'pharma_erp_suite', 'icon' => 'fa-prescription-bottle-medical', 'tone' => 'emerald', 'title' => 'PharmaPro ERP', 'desc' => 'POS, lots, achats et comptabilité pharmacie premium.', 'href' => 'pharma_erp/', 'action' => 'pharma_erp/pos/', 'action_label' => 'Caisse'],
             ['group' => 'Logistique', 'module' => 'maintenance', 'icon' => 'fa-tools', 'tone' => 'amber', 'title' => 'Maintenance', 'desc' => 'Équipements et interventions.', 'href' => 'maintenance/', 'action' => 'maintenance/ajouter_equipement.php', 'action_label' => 'Équipement'],
             ['group' => 'Communication', 'module' => 'communication', 'icon' => 'fa-comments', 'tone' => 'rose', 'title' => 'Communication', 'desc' => 'Messagerie et annonces internes.', 'href' => 'communication/', 'action' => 'communication/nouveau_message.php', 'action_label' => 'Message'],
             ['group' => 'Système', 'module' => 'parametres', 'icon' => 'fa-cog', 'tone' => 'slate', 'title' => 'Paramètres', 'desc' => 'Configuration de l\'établissement.', 'href' => 'parametres/', 'action' => 'parametres/utilisateurs.php', 'action_label' => 'Utilisateurs', 'admin_action' => true],
@@ -42,6 +43,14 @@ if (!function_exists('app_home_date_fr')) {
 
         $visible = [];
         foreach ($all as $mod) {
+            if (!empty($mod['feature'])) {
+                if (!function_exists('tenant_feature_enabled')) {
+                    require_once __DIR__ . '/saas/saas_helpers.php';
+                }
+                if (!tenant_feature_enabled((string) $mod['feature'])) {
+                    continue;
+                }
+            }
             if (!empty($mod['module']) && !$auth->aAccesModule($mod['module'])) {
                 continue;
             }

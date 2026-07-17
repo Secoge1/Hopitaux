@@ -52,7 +52,7 @@ if (!function_exists('app_payment_sync_notice_assets_once')) {
 
         echo <<<'HTML'
 <style>
-.payment-sync-feature-block { position: relative; padding-top: 0.65rem; margin-bottom: 1rem; }
+.payment-sync-feature-block { position: relative; padding-top: 0.65rem; margin-bottom: 1rem; overflow: visible; }
 .payment-sync-global-banner {
     display: flex;
     align-items: flex-start;
@@ -140,26 +140,32 @@ if (!function_exists('app_payment_sync_notice_assets_once')) {
     if (window.__paymentSyncNoticeInit) return;
     window.__paymentSyncNoticeInit = true;
 
-    function noticeKey(uid) {
-        return 'hopitaux_payment_sync_notice_' + uid;
+    function noticeKey(uid, kind) {
+        return 'hopitaux_payment_sync_notice_' + kind + '_' + uid;
+    }
+
+    function noticeKind(el) {
+        var kind = el.getAttribute('data-notice-kind') || 'banner';
+        return kind === 'badge' ? 'badge' : 'banner';
     }
 
     function shouldShow(el) {
         var uid = el.getAttribute('data-user-id') || '0';
         var stamp = el.getAttribute('data-feature-stamp') || '';
-        var seen = localStorage.getItem(noticeKey(uid));
+        var kind = noticeKind(el);
+        var seen = localStorage.getItem(noticeKey(uid, kind));
         return !seen || seen !== stamp;
     }
 
-    function markSeen(uid, stamp) {
+    function markSeen(uid, stamp, kind) {
         try {
-            localStorage.setItem(noticeKey(uid), stamp);
+            localStorage.setItem(noticeKey(uid, kind), stamp);
         } catch (e) {}
     }
 
-    function hideNotice(el, uid, stamp) {
+    function hideNotice(el, uid, stamp, kind) {
         el.classList.add('is-hidden');
-        markSeen(uid, stamp);
+        markSeen(uid, stamp, kind);
         window.setTimeout(function () {
             if (el.parentNode) el.parentNode.removeChild(el);
         }, 700);
@@ -177,19 +183,30 @@ if (!function_exists('app_payment_sync_notice_assets_once')) {
 
             var uid = el.getAttribute('data-user-id') || '0';
             var stamp = el.getAttribute('data-feature-stamp') || '';
+            var kind = noticeKind(el);
 
             var closeBtn = el.querySelector('[data-payment-sync-dismiss]');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function () {
                     document.querySelectorAll('.payment-sync-notice').forEach(function (n) {
-                        hideNotice(n, n.getAttribute('data-user-id') || uid, n.getAttribute('data-feature-stamp') || stamp);
+                        if (noticeKind(n) !== 'banner') {
+                            return;
+                        }
+                        hideNotice(
+                            n,
+                            n.getAttribute('data-user-id') || uid,
+                            n.getAttribute('data-feature-stamp') || stamp,
+                            'banner'
+                        );
                     });
                 });
             }
 
-            window.setTimeout(function () {
-                if (el.parentNode) hideNotice(el, uid, stamp);
-            }, 10000);
+            if (kind === 'banner') {
+                window.setTimeout(function () {
+                    if (el.parentNode) hideNotice(el, uid, stamp, 'banner');
+                }, 10000);
+            }
         });
     }
 
@@ -230,7 +247,7 @@ if (!function_exists('app_payment_sync_global_banner')) {
         $consultUrl = function_exists('app_url') ? app_url('consultations/index.php') : 'consultations/index.php';
         $paiementsUrl = function_exists('app_url') ? app_url('paiements/index.php') : 'paiements/index.php';
 
-        echo '<div class="payment-sync-notice"' . $attrs . ' role="status" aria-live="polite">';
+        echo '<div class="payment-sync-notice" data-notice-kind="banner"' . $attrs . ' role="status" aria-live="polite">';
         echo '<div class="payment-sync-global-banner">';
         echo '<span class="payment-sync-global-banner__icon"><i class="fas fa-star"></i></span>';
         echo '<div class="payment-sync-global-banner__body">';
@@ -260,7 +277,7 @@ if (!function_exists('app_payment_sync_new_badge')) {
 
         app_payment_sync_notice_assets_once();
 
-        echo '<span class="payment-sync-new-badge payment-sync-notice"' . app_payment_sync_notice_attrs($ctx)
+        echo '<span class="payment-sync-new-badge payment-sync-notice" data-notice-kind="badge"' . app_payment_sync_notice_attrs($ctx)
             . ' role="status" aria-live="polite">'
             . '<i class="fas fa-star"></i> '
             . htmlspecialchars($label, ENT_QUOTES, 'UTF-8')

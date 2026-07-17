@@ -42,7 +42,7 @@ class Auth {
             require_once __DIR__ . '/db.php';
             $pdo = getDB();
             $stmt = $pdo->prepare(
-                'SELECT id, nom_utilisateur, email, role, statut, tenant_id
+                'SELECT id, nom_utilisateur, email, role, statut, tenant_id, is_platform_admin
                  FROM utilisateurs WHERE id = ? LIMIT 1'
             );
             $stmt->execute([(int) $_SESSION['user_id']]);

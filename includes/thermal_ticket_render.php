@@ -60,7 +60,7 @@ if (!function_exists('thermal_ticket_append_logo_escpos')) {
      */
     function thermal_ticket_append_logo_escpos(EscPosPrinter $printer, $sys, int $widthMm): void
     {
-        $maxPx = $widthMm >= 80 ? 384 : 256;
+        $maxPx = thermal_printer_raster_max_px($widthMm);
         $logoPath = $sys->getLogoPath();
         if ($logoPath && is_readable($logoPath)) {
             $printer->image($logoPath, $maxPx);
@@ -258,7 +258,9 @@ if (!function_exists('thermal_ticket_render_html')) {
         $total = htmlspecialchars(ct_money((float) ($data['total_general'] ?? 0)));
         $consultId = (int) ($c['id'] ?? 0);
         $settings = thermal_printer_settings();
-        $widthMm = max(58, (int) ($settings['largeur_mm'] ?? 80));
+        $widthMm = (int) ($settings['largeur_mm'] ?? 80);
+        $printableMm = thermal_printer_printable_width_mm($widthMm);
+        $paperClass = $widthMm <= 58 ? 'thermal-paper-58' : 'thermal-paper-80';
         $tel = trim((string) $sys->get('telephone', ''));
         $adresse = trim((string) $sys->get('adresse', ''));
         $specialite = trim((string) ($c['medecin_specialite'] ?? ''));
@@ -286,7 +288,10 @@ if (!function_exists('thermal_ticket_render_html')) {
     <title>Ticket <?= $ticketNo ?></title>
     <link rel="stylesheet" href="<?= $cssUrl ?>">
     <style>
-        :root { --thermal-width-mm: <?= (int) $widthMm ?>mm; }
+        :root {
+            --thermal-width-mm: <?= (int) $widthMm ?>mm;
+            --thermal-printable-mm: <?= (int) $printableMm ?>mm;
+        }
     </style>
     <?php if ($autoPrint): ?>
     <script>
@@ -298,7 +303,7 @@ if (!function_exists('thermal_ticket_render_html')) {
     </script>
     <?php endif; ?>
 </head>
-<body class="thermal-body" data-return-url="<?= $returnUrlEsc ?>">
+<body class="thermal-body <?= htmlspecialchars($paperClass, ENT_QUOTES, 'UTF-8') ?>" data-return-url="<?= $returnUrlEsc ?>">
 
     <!-- ====== CONTRÔLES (écran seulement) ====== -->
     <div class="thermal-controls-wrapper no-print">
@@ -444,7 +449,7 @@ if (!function_exists('thermal_ticket_render_html')) {
                     .getPropertyValue('--thermal-width-mm') || '80', 10
             ) || 80;
             var heightPx  = receipt.scrollHeight;
-            var heightMm  = Math.ceil(heightPx / (96 / 25.4)) + 8; // +8mm marge bas
+            var heightMm  = Math.ceil(heightPx / (96 / 25.4)) + 4; // +4mm marge bas (coupe thermique)
             if (!styleTag) {
                 styleTag = document.createElement('style');
                 document.head.appendChild(styleTag);

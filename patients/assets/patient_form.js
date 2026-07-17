@@ -4,6 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    initPatientBirthdateFields();
+
     // Amélioration du champ pays avec recherche intégrée
     const paysSelect = document.getElementById('pays');
     if (paysSelect) {
@@ -114,19 +116,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Validation de la date de naissance
+    // Validation de l'âge / date de naissance
+    const ageField = document.getElementById('age_ans');
+    if (ageField) {
+        ageField.addEventListener('blur', function() {
+            const age = parseInt(this.value, 10);
+            if (this.value !== '' && (Number.isNaN(age) || age < 0 || age > 120)) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+                showFieldError(this, 'Âge invalide (0 à 120 ans)');
+            } else if (this.value !== '') {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                removeFieldError(this);
+            }
+        });
+    }
+
     const birthField = document.getElementById('date_naissance');
     if (birthField) {
         birthField.addEventListener('blur', function() {
-            const birthDate = new Date(this.value);
+            if (!this.value || this.hasAttribute('hidden') || this.closest('[hidden]')) {
+                return;
+            }
+            const birthDate = new Date(this.value + 'T12:00:00');
             const today = new Date();
-            const age = today.getFullYear() - birthDate.getFullYear();
-            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
             if (age > 120 || age < 0) {
                 this.classList.remove('is-valid');
                 this.classList.add('is-invalid');
                 showFieldError(this, 'Date de naissance invalide');
-            } else if (this.value) {
+            } else {
                 this.classList.remove('is-invalid');
                 this.classList.add('is-valid');
                 removeFieldError(this);
@@ -299,3 +324,49 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+function initPatientBirthdateFields() {
+    const toggleBtn = document.getElementById('toggle_date_naissance');
+    const wrap = document.getElementById('date_naissance_wrap');
+    const ageField = document.getElementById('age_ans');
+    const dateField = document.getElementById('date_naissance');
+    if (!toggleBtn || !wrap || !ageField || !dateField) {
+        return;
+    }
+
+    toggleBtn.addEventListener('click', function() {
+        const showDate = wrap.hasAttribute('hidden');
+        wrap.toggleAttribute('hidden', !showDate);
+        toggleBtn.setAttribute('aria-expanded', showDate ? 'true' : 'false');
+        toggleBtn.innerHTML = showDate
+            ? '<i class="fas fa-times me-1"></i>Masquer la date'
+            : '<i class="fas fa-calendar-alt me-1"></i>Date exacte connue';
+
+        if (showDate) {
+            ageField.removeAttribute('required');
+            dateField.disabled = false;
+            dateField.setAttribute('required', 'required');
+            dateField.focus();
+        } else {
+            dateField.removeAttribute('required');
+            dateField.disabled = true;
+            ageField.setAttribute('required', 'required');
+        }
+    });
+
+    dateField.addEventListener('change', function() {
+        if (!dateField.value) {
+            return;
+        }
+        const birth = new Date(dateField.value + 'T12:00:00');
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        if (age >= 0 && age <= 120) {
+            ageField.value = String(age);
+        }
+    });
+}

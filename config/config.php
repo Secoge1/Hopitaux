@@ -4,6 +4,9 @@
  * Inclut automatiquement la configuration monétaire FCFA
  */
 
+require_once __DIR__ . '/environment.php';
+app_load_environment();
+
 // Configuration de la base de données - seulement si pas déjà définie
 if (!defined('DB_HOST')) {
     define('DB_HOST', 'localhost');
@@ -62,7 +65,9 @@ if (!defined('SITE_NAME')) {
     define('SITE_NAME', $_site_name);
     unset($_site_name);
 }
-define('SITE_URL', 'http://localhost/Hopitaux');
+if (!defined('SITE_URL')) {
+    define('SITE_URL', 'http://localhost/Hopitaux');
+}
 define('SITE_EMAIL', 'contact@secogesarl.com');
 
 // Marque plateforme SaaS (pages publiques, login) — distincte du nom/logo de chaque tenant abonné

@@ -9,6 +9,9 @@ require_once __DIR__ . '/includes/header_logo.php';
 require_once __DIR__ . '/includes/saas/SubscriptionService.php';
 require_once __DIR__ . '/includes/saas/TenantSchema.php';
 require_once __DIR__ . '/includes/saas/saas_helpers.php';
+require_once __DIR__ . '/includes/saas/PharmaCommercial.php';
+require_once __DIR__ . '/includes/saas/PharmaSubscriptionPlan.php';
+require_once __DIR__ . '/includes/pharma_erp/bootstrap.php';
 
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', efficasante_web_base_path());
@@ -22,8 +25,8 @@ if ($redirect && preg_match('#^https?://#i', $redirect)) {
     $redirect = ltrim($redirect, '/');
 }
 
-if (isset($_SESSION['user_id'], $_SESSION['user_connected']) && $_SESSION['user_connected'] === true) {
-    header('Location: ' . ($redirect ?: 'dashboard.php'));
+        if (isset($_SESSION['user_id'], $_SESSION['user_connected']) && $_SESSION['user_connected'] === true) {
+    header('Location: ' . pharma_erp_post_login_url($redirect ?: null));
     exit();
 }
 
@@ -34,14 +37,32 @@ $appYear = date('Y');
 $documentationUrl = BASE_PATH . '/documentation.php';
 
 $demoAccount = null;
-try {
-    TenantSchema::ensure();
-    $demoAccount = SubscriptionService::getInstance()->ensureDemoTenant();
-} catch (Exception $e) {
-    error_log('Demo tenant: ' . $e->getMessage());
+$demoTry = isset($_GET['demo_try']);
+$demoProduct = PharmaCommercial::normalizeProductLine($_GET['product'] ?? '');
+if ($demoTry && $demoProduct === 'clinical' && function_exists('app_is_pharma_production_host') && app_is_pharma_production_host()) {
+    $demoProduct = PharmaSubscriptionPlan::PRODUCT_LINE;
+    if ($redirect === '') {
+        $redirect = 'pharma_erp/';
+    }
+}
+if ($demoTry) {
+    try {
+        TenantSchema::ensure();
+        if ($demoProduct === PharmaSubscriptionPlan::PRODUCT_LINE) {
+            $demoAccount = PharmaCommercial::ensurePharmaDemoTenant();
+            if ($redirect === '') {
+                $redirect = 'pharma_erp/';
+            }
+        } else {
+            $demoAccount = SubscriptionService::getInstance()->ensureDemoTenant();
+        }
+    } catch (Exception $e) {
+        error_log('Demo tenant: ' . $e->getMessage());
+        $error = 'Impossible de préparer l\'environnement de démonstration. Réessayez dans quelques instants.';
+    }
 }
 
-if (isset($_GET['demo_try']) && $demoAccount) {
+if ($demoTry && $demoAccount) {
     try {
         $pdo = getDB();
         $stmt = $pdo->prepare(
@@ -52,12 +73,16 @@ if (isset($_GET['demo_try']) && $demoAccount) {
         if ($user && password_verify($demoAccount['password'], $user['mot_de_passe'])) {
             $auth = Auth::getInstance();
             $auth->connecter($user);
-            header('Location: ' . ($redirect ?: 'dashboard.php'));
+            header('Location: ' . pharma_erp_post_login_url($redirect ?: null));
             exit();
         }
+        $error = 'Connexion démo impossible (compte introuvable ou mot de passe obsolète). Contactez le support.';
     } catch (Exception $e) {
         error_log('Demo login: ' . $e->getMessage());
+        $error = 'Erreur lors de la connexion démo. Veuillez réessayer.';
     }
+} elseif ($demoTry && $error === '') {
+    $error = 'Environnement de démonstration indisponible. Vérifiez que la base de données est accessible.';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
@@ -79,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             if ($utilisateur) {
                 Auth::getInstance()->connecter($utilisateur);
-                header('Location: ' . ($redirect ?: 'dashboard.php'));
+                header('Location: ' . pharma_erp_post_login_url($redirect ?: null));
                 exit();
             }
             $error = 'Identifiants incorrects ou compte inactif.';

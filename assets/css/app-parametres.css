@@ -290,13 +290,9 @@
     color: var(--app-text, #1e293b);
 }
 
-.param-card-body .btn-primary {
-    background: linear-gradient(135deg, #1b4f9b, #1b8fad);
-    border: none;
-}
-
+.param-card-body .btn-primary,
 .param-card-body .btn-success {
-    background: linear-gradient(135deg, #0d9488, #00b5ad);
+    background: var(--app-gradient);
     border: none;
 }
 

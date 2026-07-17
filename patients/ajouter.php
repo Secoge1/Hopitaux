@@ -7,6 +7,7 @@ require_once __DIR__ . '/../models/Patient.php';
 require_once __DIR__ . '/../models/Assurance.php';
 require_once __DIR__ . '/../models/Medecin.php';
 require_once __DIR__ . '/../includes/staff_scope.php';
+require_once __DIR__ . '/../includes/patient_birthdate.php';
 
 $patientModel = new Patient();
 $assuranceModel = new Assurance();
@@ -28,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = [
             'nom' => $_POST['nom'],
             'prenom' => $_POST['prenom'],
-            'date_naissance' => $_POST['date_naissance'],
+            'date_naissance' => patient_resolve_date_naissance_from_post($_POST),
             'genre' => $_POST['genre'],
             'groupe_sanguin' => $_POST['groupe_sanguin'] ?: null,
             'telephone' => $_POST['telephone'] ?: null,
@@ -166,8 +167,16 @@ app_module_flash();
                     </div>
 
                     <div class="col-md-4">
-                        <label for="date_naissance" class="form-label">Date de naissance *</label>
-                        <input type="date" class="form-control" id="date_naissance" name="date_naissance" required>
+                        <label for="age_ans" class="form-label">Âge (ans) *</label>
+                        <input type="number" class="form-control" id="age_ans" name="age_ans" min="0" max="120" step="1" required placeholder="Ex. 35" inputmode="numeric">
+                        <small class="form-text text-muted">Saisie directe si la date exacte est inconnue</small>
+                        <button type="button" class="btn btn-link btn-sm p-0 mt-1" id="toggle_date_naissance" aria-expanded="false">
+                            <i class="fas fa-calendar-alt me-1"></i>Date exacte connue
+                        </button>
+                        <div id="date_naissance_wrap" class="mt-2" hidden>
+                            <label for="date_naissance" class="form-label">Date de naissance exacte</label>
+                            <input type="date" class="form-control" id="date_naissance" name="date_naissance" disabled max="<?php echo date('Y-m-d'); ?>">
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -497,7 +506,7 @@ app_module_flash();
         </div>
 
 <?php ob_start(); ?>
-<script src="../assets/patient_form.js"></script>
+<script src="assets/patient_form.js"></script>
 <script>
 function toggleAssuranceSection() {
             const action = document.querySelector('input[name="assurance_action"]:checked').value;

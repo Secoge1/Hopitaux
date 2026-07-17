@@ -28,18 +28,17 @@ flutter pub get
 
 ### 3. Configurer l’URL de l’API
 
-Ouvrez **`lib/config/api_config.dart`** et modifiez `baseUrl` selon votre environnement :
+Ouvrez **`lib/config/api_config.dart`**. En **release** (`flutter build apk`), l’URL production est utilisée automatiquement :
 
-- **Émulateur Android** : `http://10.0.2.2/efficasante` (localhost du PC)
-- **Simulateur iOS** : `http://localhost/efficasante` ou `http://127.0.0.1/efficasante`
-- **Appareil réel** : `http://VOTRE_IP/efficasante` (ex. `http://192.168.1.10/efficasante`)
-- **Production** : `https://votredomaine.com/efficasante`
+- **Production** : `https://sesante.secogesarl.com`
 
-### 4. Activer l’API REST sur le serveur
+En **debug** (`flutter run`), par défaut :
 
-L’API REST est dans **`api/rest/index.php`** (à la racine du projet Efficasante, pas dans l’app Flutter).
+- **Émulateur Android** : `http://10.0.2.2/Hopitaux`
+- **Simulateur iOS** : remplacez temporairement par `http://localhost/Hopitaux` dans `baseUrl`
+- **Appareil réel** : IP du PC, ex. `http://192.168.1.10/Hopitaux`
 
-- Vérifiez que le serveur PHP sert bien ce fichier (ex. `https://votredomaine.com/efficasante/api/rest/index.php?path=login`).
+Vérifiez l’API : `https://sesante.secogesarl.com/api/rest/index.php?path=login` (POST JSON).
 - La table **`api_tokens`** est créée automatiquement au premier appel.
 
 ## Lancer l’application
@@ -91,9 +90,23 @@ Puis ouvrir `ios/Runner.xcworkspace` dans Xcode, configurer la signature et lanc
 - **Patients** (liste, détail, recherche)
 - **Rendez-vous** (liste, filtre par date)
 - **Consultations** (liste)
-- **Plus** : Laboratoire, Paiements, Communication, Pharmacie, Finances, Paramètres (écrans « à venir »), Déconnexion
+- **Plus** : Laboratoire, Paiements, Communication, **PharmaPro ERP** (caisse POS, produits, alertes stock), Finances, Paramètres (écrans « à venir »), Déconnexion
 
 Les modules Laboratoire, Paiements, etc. peuvent être complétés plus tard en ajoutant les routes correspondantes dans l’API PHP et les écrans dans Flutter.
+
+**PharmaPro ERP** : menu Plus → PharmaPro ERP (rôles admin/pharmacien/comptable, feature `pharma_erp_suite` activée). API : `/api/rest/pharma/index.php`.
+
+Fonctionnalités PharmaPro mobile :
+- **Scanner caméra** code-barres (caisse POS et recherche produits)
+- **Affichage code-barres** sur chaque fiche produit (EAN/Code128)
+- **Modification codes-barres** depuis la fiche produit (admin/pharmacien) : principal, alternatifs, scan
+- **Rapports PDF** Bilan et Grand Livre (admin/comptable, icône PDF sur l’accueil PharmaPro)
+- **Déverrouillage biométrique** (Plus → interrupteur empreinte / Face ID)
+
+Après `flutter create .`, ajoutez la permission caméra dans `android/app/src/main/AndroidManifest.xml` :
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+```
 
 ## Dépannage
 

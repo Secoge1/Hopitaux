@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /home.php
+Allow: /tarifs.php
+Allow: /documentation.php
+Allow: /subscribe.php
+Allow: /assets/
+Allow: /images/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.svg
+
+# Pages privées (nécessitent connexion)
+Disallow: /index.php
+Disallow: /dashboard.php
+Disallow: /patients/
+Disallow: /consultations/
+Disallow: /rendez-vous/
+Disallow: /laboratoire/
+Disallow: /paiements/
+Disallow: /finances/
+Disallow: /parametres/
+Disallow: /admin_platform/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /models/
+Disallow: /login.php
+Disallow: /logout.php
+
+# Fichiers sensibles
+Disallow: /.htaccess
+Disallow: /composer.json
+Disallow: /README.md
+
+# Sitemap
+Sitemap: /sitemap.xml

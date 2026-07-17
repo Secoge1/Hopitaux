@@ -77,7 +77,7 @@ app_module_flash();
 
         <div class="row g-4">
             <div class="col-lg-8 mb-4 mb-lg-0">
-                <div class="fin-panel h-100">
+                <div class="fin-panel">
                     <div class="fin-panel-head">
                         <h2><i class="fas fa-list me-2"></i>Écritures comptables</h2>
                         <span class="fin-count-badge">

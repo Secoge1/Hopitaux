@@ -1,5 +1,12 @@
 <?php
 require_once 'includes/init.php';
+
+if (defined('APP_PHARMA_HOST') && APP_PHARMA_HOST) {
+    $auth = Auth::getInstance();
+    header('Location: ' . app_url($auth->estConnecte() ? 'pharma_erp/' : 'tarifs_pharma.php'));
+    exit();
+}
+
 require_once 'includes/app_layout.php';
 require_once 'includes/app_home_modules.php';
 

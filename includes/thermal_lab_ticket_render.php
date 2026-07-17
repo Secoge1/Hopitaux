@@ -136,7 +136,9 @@ if (!function_exists('thermal_lab_ticket_render_html')) {
         $analyseId = (int) ($a['id'] ?? 0);
         $typeLabel = htmlspecialchars((string) ($data['type_label'] ?? ''));
         $settings = thermal_printer_settings();
-        $widthMm = max(58, (int) ($settings['largeur_mm'] ?? 80));
+        $widthMm = (int) ($settings['largeur_mm'] ?? 80);
+        $printableMm = thermal_printer_printable_width_mm($widthMm);
+        $paperClass = $widthMm <= 58 ? 'thermal-paper-58' : 'thermal-paper-80';
         $tel = trim((string) $sys->get('telephone', ''));
         $adresse = trim((string) $sys->get('adresse', ''));
         $returnUrl = thermal_ticket_sanitize_return_url($returnUrl) ?: thermal_lab_ticket_default_return_url($a);
@@ -162,7 +164,10 @@ if (!function_exists('thermal_lab_ticket_render_html')) {
     <title>Ticket <?= $ticketNo ?></title>
     <link rel="stylesheet" href="<?= $cssUrl ?>">
     <style>
-        :root { --thermal-width-mm: <?= (int) $widthMm ?>mm; }
+        :root {
+            --thermal-width-mm: <?= (int) $widthMm ?>mm;
+            --thermal-printable-mm: <?= (int) $printableMm ?>mm;
+        }
         /* Bandeau laboratoire : rouge sang au lieu de noir */
         .thermal-title-band--lab {
             background: #c62828;
@@ -178,7 +183,7 @@ if (!function_exists('thermal_lab_ticket_render_html')) {
     </script>
     <?php endif; ?>
 </head>
-<body class="thermal-body" data-return-url="<?= $returnUrlEsc ?>">
+<body class="thermal-body <?= htmlspecialchars($paperClass, ENT_QUOTES, 'UTF-8') ?>" data-return-url="<?= $returnUrlEsc ?>">
 
     <!-- ====== CONTRÔLES (écran seulement) ====== -->
     <div class="thermal-controls-wrapper no-print">
@@ -308,7 +313,7 @@ if (!function_exists('thermal_lab_ticket_render_html')) {
                     .getPropertyValue('--thermal-width-mm') || '80', 10
             ) || 80;
             var heightPx = receipt.scrollHeight;
-            var heightMm = Math.ceil(heightPx / (96 / 25.4)) + 8;
+            var heightMm = Math.ceil(heightPx / (96 / 25.4)) + 4;
             if (!styleTag) {
                 styleTag = document.createElement('style');
                 document.head.appendChild(styleTag);

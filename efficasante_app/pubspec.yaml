@@ -15,6 +15,12 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.18.1
   flutter_secure_storage: ^9.0.0
+  mobile_scanner: ^6.0.2
+  barcode: ^2.2.9
+  barcode_widget: ^2.0.4
+  local_auth: ^2.3.0
+  path_provider: ^2.1.4
+  open_filex: ^4.5.0
 
 dev_dependencies:
   flutter_test:

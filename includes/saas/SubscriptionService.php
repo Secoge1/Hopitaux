@@ -250,21 +250,27 @@ class SubscriptionService
         }
 
         $username = 'demo';
+        $password = 'demo123';
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         $user = $pdo->prepare('SELECT id FROM utilisateurs WHERE nom_utilisateur = ? AND tenant_id = ? LIMIT 1');
         $user->execute([$username, $tenantId]);
         if (!$user->fetch()) {
-            $hash = password_hash('demo123', PASSWORD_DEFAULT);
             $pdo->prepare("
                 INSERT INTO utilisateurs (tenant_id, nom_utilisateur, email, mot_de_passe, role, statut)
                 VALUES (?, ?, 'demo@efficasante.local', ?, 'admin', 'actif')
             ")->execute([$tenantId, $username, $hash]);
+        } else {
+            $pdo->prepare("
+                UPDATE utilisateurs SET mot_de_passe = ?, statut = 'actif', role = 'admin'
+                WHERE nom_utilisateur = ? AND tenant_id = ?
+            ")->execute([$hash, $username, $tenantId]);
         }
 
         return [
             'tenant_id' => $tenantId,
             'tenant_key' => $tenantKey,
             'username' => $username,
-            'password' => 'demo123',
+            'password' => $password,
         ];
     }
 }

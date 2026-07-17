@@ -58,10 +58,13 @@ if (!function_exists('saas_is_whitelisted_page')) {
         if (strpos($script, '/admin_platform/') !== false) {
             return true;
         }
+        if (strpos($script, '/pharma_erp/') !== false) {
+            return true;
+        }
         $whitelist = [
-            'renew.php', 'subscribe.php', 'tarifs.php', 'payment_instructions.php',
-            'login.php', 'home.php', 'documentation.php', 'admin_tenants.php', 'logout.php',
-            'migrate_saas_multitenant.php',
+            'renew.php', 'subscribe.php', 'subscribe_pharma.php', 'tarifs.php', 'tarifs_pharma.php',
+            'payment_instructions.php', 'login.php', 'home.php', 'documentation.php',
+            'admin_tenants.php', 'logout.php', 'migrate_saas_multitenant.php',
         ];
         return in_array(basename($script), $whitelist, true);
     }
@@ -210,5 +213,42 @@ if (!function_exists('payment_finance_sync_enabled')) {
     {
         require_once __DIR__ . '/PlatformTenantFeatures.php';
         return tenant_feature_enabled(PlatformTenantFeatures::PAYMENT_FINANCE_SYNC, $tenantId);
+    }
+}
+
+if (!function_exists('saas_order_is_pharma')) {
+    function saas_order_is_pharma(array $order): bool
+    {
+        require_once __DIR__ . '/PharmaCommercial.php';
+        return PharmaCommercial::isPharmaOrder($order);
+    }
+}
+
+if (!function_exists('saas_order_plan')) {
+    /** @return array<string, mixed> */
+    function saas_order_plan(array $order): array
+    {
+        require_once __DIR__ . '/PharmaCommercial.php';
+        require_once __DIR__ . '/PharmaSubscriptionPlan.php';
+        require_once __DIR__ . '/SubscriptionPlan.php';
+
+        if (saas_order_is_pharma($order)) {
+            return PharmaSubscriptionPlan::get($order['license_type'] ?? PharmaSubscriptionPlan::ANNUAL);
+        }
+        return SubscriptionPlan::get($order['license_type'] ?? SubscriptionPlan::ANNUAL);
+    }
+}
+
+if (!function_exists('saas_order_is_lifetime')) {
+    function saas_order_is_lifetime(array $order): bool
+    {
+        require_once __DIR__ . '/PharmaCommercial.php';
+        require_once __DIR__ . '/PharmaSubscriptionPlan.php';
+        require_once __DIR__ . '/SubscriptionPlan.php';
+
+        if (saas_order_is_pharma($order)) {
+            return PharmaSubscriptionPlan::isLifetime($order['license_type'] ?? '');
+        }
+        return SubscriptionPlan::isLifetime($order['license_type'] ?? '');
     }
 }

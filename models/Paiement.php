@@ -311,7 +311,6 @@ class Paiement {
         $data = [
             'patient_id' => (int) $analyse['patient_id'],
             'analyse_id' => $analyseId,
-            'numero_facture' => $options['numero_facture'] ?? $this->generateNumeroFacture(),
             'montant' => $montant,
             'type_paiement' => $options['type_paiement'] ?? 'especes',
             'statut' => $options['statut'] ?? 'en_attente',
@@ -321,6 +320,9 @@ class Paiement {
             'notes' => $options['notes'] ?? null,
             'cree_par' => $options['cree_par'] ?? null,
         ];
+        if (!empty($options['numero_facture'])) {
+            $data['numero_facture'] = $options['numero_facture'];
+        }
 
         return $this->create($data);
     }
@@ -363,7 +365,6 @@ class Paiement {
         $data = [
             'patient_id' => (int) $consultation['patient_id'],
             'consultation_id' => $consultationId,
-            'numero_facture' => $options['numero_facture'] ?? $this->generateNumeroFacture(),
             'montant' => $montant,
             'type_paiement' => $options['type_paiement'] ?? 'especes',
             'statut' => $options['statut'] ?? 'en_attente',
@@ -373,81 +374,113 @@ class Paiement {
             'notes' => $options['notes'] ?? null,
             'cree_par' => $options['cree_par'] ?? null,
         ];
+        if (!empty($options['numero_facture'])) {
+            $data['numero_facture'] = $options['numero_facture'];
+        }
 
         return $this->create($data);
     }
     
+    private function rollbackTransactionIfActive(): void
+    {
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->rollBack();
+        }
+    }
+
+    private function isDuplicatePaymentInsertError(PDOException $e): bool
+    {
+        return (int) ($e->errorInfo[1] ?? 0) === 1062;
+    }
+
     /**
      * Crée un nouveau paiement et synchronise avec le module Finances
      */
     public function create($data) {
-        $this->pdo->beginTransaction();
-        
-        try {
-            $ref = $data['reference_paiement'] ?? null;
-            if ($ref === null || $ref === '' || (is_string($ref) && trim($ref) === '')) {
-                $data['reference_paiement'] = $this->generateReferencePaiement();
-            } elseif (is_string($ref)) {
-                $data['reference_paiement'] = trim($ref);
-            }
-            
-            $columns = [
-                'patient_id', 'consultation_id', 'numero_facture', 'montant',
-                'type_paiement', 'statut', 'description', 'date_paiement',
-                'reference_paiement', 'notes', 'date_creation',
-            ];
-            $placeholders = array_fill(0, count($columns) - 1, '?');
-            $placeholders[] = 'NOW()';
-            $values = [
-                $data['patient_id'],
-                $data['consultation_id'] ?? null,
-                $data['numero_facture'],
-                $data['montant'],
-                $data['type_paiement'],
-                $data['statut'],
-                $data['description'] ?? null,
-                $data['date_paiement'] ?? date('Y-m-d H:i:s'),
-                $data['reference_paiement'],
-                $data['notes'] ?? null,
-            ];
-            if ($this->hasColumn('analyse_id')) {
-                $columns[] = 'analyse_id';
-                array_splice($placeholders, count($placeholders) - 1, 0, '?');
-                $values[] = $data['analyse_id'] ?? null;
-            }
-            TenantScope::bindInsert($this->pdo, 'paiements', $columns, $placeholders, $values);
-            $sql = 'INSERT INTO paiements (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')';
-            
-            $stmt = $this->pdo->prepare($sql);
-            $result = $stmt->execute($values);
-            
-            if ($result) {
-                $paiement_id = $this->pdo->lastInsertId();
-                
-                // Synchroniser avec le module Finances si activé par l'admin plateforme
+        $maxAttempts = 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $this->rollbackTransactionIfActive();
+            $this->pdo->beginTransaction();
+
+            try {
+                $ref = $data['reference_paiement'] ?? null;
+                if ($ref === null || $ref === '' || (is_string($ref) && trim($ref) === '')) {
+                    $data['reference_paiement'] = $this->generateReferencePaiement();
+                } elseif (is_string($ref)) {
+                    $data['reference_paiement'] = trim($ref);
+                }
+
+                if (empty($data['numero_facture'])) {
+                    $data['numero_facture'] = $this->generateNumeroFacture();
+                }
+
+                $columns = [
+                    'patient_id', 'consultation_id', 'numero_facture', 'montant',
+                    'type_paiement', 'statut', 'description', 'date_paiement',
+                    'reference_paiement', 'notes', 'date_creation',
+                ];
+                $placeholders = array_fill(0, count($columns) - 1, '?');
+                $placeholders[] = 'NOW()';
+                $values = [
+                    $data['patient_id'],
+                    $data['consultation_id'] ?? null,
+                    $data['numero_facture'],
+                    $data['montant'],
+                    $data['type_paiement'],
+                    $data['statut'],
+                    $data['description'] ?? null,
+                    $data['date_paiement'] ?? date('Y-m-d H:i:s'),
+                    $data['reference_paiement'],
+                    $data['notes'] ?? null,
+                ];
+                if ($this->hasColumn('analyse_id')) {
+                    $columns[] = 'analyse_id';
+                    array_splice($placeholders, count($placeholders) - 1, 0, '?');
+                    $values[] = $data['analyse_id'] ?? null;
+                }
+                TenantScope::bindInsert($this->pdo, 'paiements', $columns, $placeholders, $values);
+                $sql = 'INSERT INTO paiements (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')';
+
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute($values);
+
+                $paiement_id = (int) $this->pdo->lastInsertId();
+
+                $this->pdo->commit();
+
                 if (($data['statut'] ?? 'en_attente') === 'paye' && $this->financeSyncEnabled()) {
-                    $this->syncWithFinances((int) $paiement_id, $data);
+                    if (!$this->syncWithFinances($paiement_id, $data)) {
+                        throw new RuntimeException(
+                            'Paiement enregistré mais la synchronisation comptable a échoué. Vérifiez le module Finances.'
+                        );
+                    }
                 }
 
                 $this->invalidateDashboardCache();
-
                 PaymentAudit::log('paiement_create', [
-                    'paiement_id' => (int) $paiement_id,
+                    'paiement_id' => $paiement_id,
                     'statut' => $data['statut'] ?? 'en_attente',
                     'montant' => (float) ($data['montant'] ?? 0),
                     'numero_facture' => $data['numero_facture'] ?? '',
                 ]);
-                
-                $this->pdo->commit();
+
                 return $paiement_id;
+            } catch (PDOException $e) {
+                $this->rollbackTransactionIfActive();
+                if ($attempt < $maxAttempts && $this->isDuplicatePaymentInsertError($e)) {
+                    $data['numero_facture'] = '';
+                    $data['reference_paiement'] = null;
+                    continue;
+                }
+                throw $e;
+            } catch (Exception $e) {
+                $this->rollbackTransactionIfActive();
+                throw $e;
             }
-            
-            $this->pdo->rollBack();
-            return false;
-        } catch (Exception $e) {
-            $this->pdo->rollBack();
-            throw $e;
         }
+
+        return false;
     }
     
     /**
@@ -870,23 +903,70 @@ class Paiement {
     }
     
     /**
+     * Sync comptable après commit paiement (évite transactions PDO imbriquées avec Finances).
+     */
+    private function applyFinanceSyncAfterPaymentChange(
+        int $paiementId,
+        array $ancienPaiement,
+        array $nouveauData,
+        string $ancienStatut,
+        string $nouveauStatut
+    ): void {
+        if (!$this->financeSyncEnabled()) {
+            return;
+        }
+
+        $merged = array_merge($ancienPaiement, $nouveauData);
+        $wasPaye = $ancienStatut === 'paye';
+        $isPaye = $nouveauStatut === 'paye';
+        $isReversed = in_array($nouveauStatut, ['annule', 'rembourse'], true);
+        $hadEcriture = !empty($ancienPaiement['ecriture_comptable_id']);
+
+        if ($isReversed && $wasPaye && $hadEcriture) {
+            if (!$this->reverseFinancesSync($paiementId, $merged, $nouveauStatut)) {
+                throw new RuntimeException('Paiement mis à jour mais la contre-passation comptable a échoué.');
+            }
+            return;
+        }
+
+        if (!$isPaye && $wasPaye && $hadEcriture) {
+            if (!$this->reverseFinancesSync($paiementId, $merged, 'statut_' . $nouveauStatut)) {
+                throw new RuntimeException('Paiement mis à jour mais la contre-passation comptable a échoué.');
+            }
+            return;
+        }
+
+        if ($isPaye && !$wasPaye) {
+            if (!$this->syncWithFinances($paiementId, $merged)) {
+                throw new RuntimeException('Paiement mis à jour mais la synchronisation comptable a échoué.');
+            }
+            return;
+        }
+
+        if ($isPaye && $wasPaye && !$hadEcriture) {
+            if (!$this->syncWithFinances($paiementId, $merged)) {
+                throw new RuntimeException('Paiement mis à jour mais la synchronisation comptable a échoué.');
+            }
+        }
+    }
+
+    /**
      * Met à jour un paiement existant et synchronise avec Finances si nécessaire
      */
     public function update($id, $data) {
+        $ancien_paiement = $this->getById($id);
+        if (!$ancien_paiement) {
+            throw new RuntimeException('Paiement introuvable.');
+        }
+
+        $this->assertUpdateAllowed($ancien_paiement, $data);
+
+        $ancien_statut = $ancien_paiement['statut'] ?? 'en_attente';
+        $nouveau_statut = $data['statut'] ?? $ancien_statut;
+
         $this->pdo->beginTransaction();
-        
+
         try {
-            // Récupérer l'ancien paiement pour vérifier le changement de statut
-            $ancien_paiement = $this->getById($id);
-            if (!$ancien_paiement) {
-                throw new RuntimeException('Paiement introuvable.');
-            }
-
-            $this->assertUpdateAllowed($ancien_paiement, $data);
-
-            $ancien_statut = $ancien_paiement['statut'] ?? 'en_attente';
-            $nouveau_statut = $data['statut'] ?? $ancien_statut;
-            
             // Vérifier si la colonne date_modification existe
             $hasDateModification = false;
             try {
@@ -945,46 +1025,35 @@ class Paiement {
             }
             
             $stmt = $this->pdo->prepare($sql);
-            $result = $stmt->execute(TenantScope::appendOwned($this->pdo, 'paiements', $updateValues));
-            
-            if ($result) {
-                $merged = array_merge($ancien_paiement, $data);
-                $wasPaye = $ancien_statut === 'paye';
-                $isPaye = $nouveau_statut === 'paye';
-                $isReversed = in_array($nouveau_statut, ['annule', 'rembourse'], true);
-                $hadEcriture = !empty($ancien_paiement['ecriture_comptable_id']);
+            $stmt->execute(TenantScope::appendOwned($this->pdo, 'paiements', $updateValues));
 
-                if ($isReversed && $wasPaye && $hadEcriture) {
-                    $this->reverseFinancesSync((int) $id, $merged, $nouveau_statut);
-                } elseif (!$isPaye && $wasPaye && $hadEcriture) {
-                    $this->reverseFinancesSync((int) $id, $merged, 'statut_' . $nouveau_statut);
-                } elseif ($isPaye && !$wasPaye) {
-                    $this->syncWithFinances((int) $id, $merged);
-                } elseif ($isPaye && $wasPaye && !$hadEcriture) {
-                    $this->syncWithFinances((int) $id, $merged);
-                }
-
-                PaymentAudit::log('paiement_update', [
-                    'paiement_id' => (int) $id,
-                    'ancien_statut' => $ancien_statut,
-                    'nouveau_statut' => $nouveau_statut,
-                    'montant' => (float) ($merged['montant'] ?? 0),
-                ]);
-
-                $this->invalidateDashboardCache();
-                $this->pdo->commit();
-                return true;
-            }
-            
-            $this->pdo->rollBack();
-            return false;
+            $this->pdo->commit();
         } catch (RuntimeException $e) {
-            $this->pdo->rollBack();
+            $this->rollbackTransactionIfActive();
             throw $e;
         } catch (Exception $e) {
-            $this->pdo->rollBack();
+            $this->rollbackTransactionIfActive();
             throw $e;
         }
+
+        $this->applyFinanceSyncAfterPaymentChange(
+            (int) $id,
+            $ancien_paiement,
+            $data,
+            $ancien_statut,
+            $nouveau_statut
+        );
+
+        PaymentAudit::log('paiement_update', [
+            'paiement_id' => (int) $id,
+            'ancien_statut' => $ancien_statut,
+            'nouveau_statut' => $nouveau_statut,
+            'montant' => (float) ($data['montant'] ?? $ancien_paiement['montant'] ?? 0),
+        ]);
+
+        $this->invalidateDashboardCache();
+
+        return true;
     }
     
     /**
@@ -996,7 +1065,7 @@ class Paiement {
         try {
             $paiement = $this->getById((int) $id);
             if (!$paiement) {
-                $this->pdo->rollBack();
+                $this->rollbackTransactionIfActive();
                 return false;
             }
 
@@ -1017,10 +1086,10 @@ class Paiement {
                 return true;
             }
 
-            $this->pdo->rollBack();
+            $this->rollbackTransactionIfActive();
             return false;
         } catch (Exception $e) {
-            $this->pdo->rollBack();
+            $this->rollbackTransactionIfActive();
             error_log("Erreur lors de la suppression du paiement ID $id: " . $e->getMessage());
             return false;
         }
@@ -1112,38 +1181,48 @@ class Paiement {
     }
     
     /**
-     * Génère un numéro de facture unique
+     * Génère un numéro de facture unique (par tenant, séquence du jour dans le préfixe FACT + Ymd).
      */
     public function generateNumeroFacture() {
-        $prefix = 'FACT';
-        $date = date('Ymd');
-        $where = ['DATE(date_creation) = CURDATE()'];
-        $params = [];
-        $this->scopeTenant($where, $params, '');
-        $sql = 'SELECT COUNT(*) FROM paiements WHERE ' . implode(' AND ', $where);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $count = $stmt->fetchColumn();
-        
-        $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
-        return $prefix . $date . $sequence;
+        return $this->generateDailySequenceNumber('FACT', 4);
     }
     
     /**
      * Génère une référence de paiement unique (préfixe REF + date + séquence du jour)
      */
     public function generateReferencePaiement() {
-        $prefix = 'REF';
+        return $this->generateDailySequenceNumber('REF', 4);
+    }
+
+    /**
+     * Prochain numéro séquentiel du jour : MAX(suffixe existant) + 1 pour le préfixe donné.
+     * Évite les doublons liés à COUNT(date_creation) vs fuseau PHP/MySQL.
+     */
+    private function generateDailySequenceNumber(string $prefix, int $seqLen): string
+    {
         $date = date('Ymd');
-        $where = ['reference_paiement LIKE ?'];
-        $params = [$prefix . $date . '%'];
+        $stem = $prefix . $date;
+        $like = $stem . '%';
+
+        $where = ['numero_facture LIKE ?'];
+        $params = [$like];
+        if ($prefix === 'REF') {
+            $where = ['reference_paiement LIKE ?'];
+            $params = [$like];
+        }
         $this->scopeTenant($where, $params, '');
-        $sql = 'SELECT COUNT(*) FROM paiements WHERE ' . implode(' AND ', $where);
+
+        $column = $prefix === 'REF' ? 'reference_paiement' : 'numero_facture';
+        $startPos = strlen($stem) + 1;
+
+        $sql = 'SELECT COALESCE(MAX(CAST(SUBSTRING(' . $column . ', ' . $startPos . ', ' . $seqLen . ') AS UNSIGNED)), 0)
+                FROM paiements WHERE ' . implode(' AND ', $where);
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        $count = (int) $stmt->fetchColumn();
-        $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
-        return $prefix . $date . $sequence;
+        $maxSeq = (int) $stmt->fetchColumn();
+
+        return $stem . str_pad((string) ($maxSeq + 1), $seqLen, '0', STR_PAD_LEFT);
     }
     
     /**

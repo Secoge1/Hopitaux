@@ -265,6 +265,7 @@ class TenantSchema
             ['consultation_soins', 'personnel_id', 'INT DEFAULT NULL AFTER soin_id'],
             ['paiements', 'analyse_id', 'INT DEFAULT NULL AFTER consultation_id'],
             ['paiements', 'ecriture_comptable_id', 'INT DEFAULT NULL AFTER analyse_id'],
+            ['subscription_orders', 'product_line', "VARCHAR(32) NOT NULL DEFAULT 'clinical' AFTER order_type"],
         ];
         foreach ($columns as [$table, $column, $definition]) {
             if (!self::tableExists($pdo, $table) || self::columnExists($pdo, $table, $column)) {

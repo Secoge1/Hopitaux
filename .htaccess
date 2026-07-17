@@ -6,6 +6,9 @@
     RewriteEngine On
 </IfModule>
 
+# Encodage UTF-8 pour tout le site (évite les sur les accents français)
+AddDefaultCharset UTF-8
+
 # ============================================================================
 # DÉSACTIVER LE CACHE POUR LES FICHIERS PHP
 # ============================================================================

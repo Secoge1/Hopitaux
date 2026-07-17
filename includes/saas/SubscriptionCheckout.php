@@ -5,6 +5,8 @@
 
 require_once __DIR__ . '/../../config/db.php';
 require_once __DIR__ . '/SubscriptionPlan.php';
+require_once __DIR__ . '/PharmaSubscriptionPlan.php';
+require_once __DIR__ . '/PharmaCommercial.php';
 require_once __DIR__ . '/SubscriptionService.php';
 require_once __DIR__ . '/SubscriptionInvoice.php';
 require_once __DIR__ . '/TenantSchema.php';
@@ -20,8 +22,11 @@ class SubscriptionCheckout
         TenantSchema::ensure();
     }
 
-    public static function calculateAmount(string $planSlug, string $orderType = 'new'): int
+    public static function calculateAmount(string $planSlug, string $orderType = 'new', string $productLine = 'clinical'): int
     {
+        if (PharmaCommercial::isPharmaProductLine($productLine)) {
+            return PharmaSubscriptionPlan::calculateAmount($planSlug, $orderType);
+        }
         $plan = SubscriptionPlan::get($planSlug);
         if ($orderType === 'renewal') {
             return (int) ($plan['renewal_price_xof'] ?? $plan['price_xof']);
@@ -29,13 +34,24 @@ class SubscriptionCheckout
         return (int) $plan['price_xof'];
     }
 
+    private function resolvePlan(string $planSlug, string $productLine = 'clinical'): array
+    {
+        if (PharmaCommercial::isPharmaProductLine($productLine)) {
+            return PharmaSubscriptionPlan::get($planSlug);
+        }
+        return SubscriptionPlan::get($planSlug);
+    }
+
     /**
      * @param array $data license_type, company_name, email, phone?, nom_utilisateur?, password?, nom_complet?, tenant_id?, order_type?
      */
     public function createOrder(array $data): array
     {
-        $planSlug = SubscriptionPlan::normalizeSlug($data['license_type'] ?? $data['plan'] ?? '');
-        $plan = SubscriptionPlan::get($planSlug);
+        $productLine = PharmaCommercial::normalizeProductLine($data['product_line'] ?? 'clinical');
+        $planSlug = PharmaCommercial::isPharmaProductLine($productLine)
+            ? PharmaSubscriptionPlan::normalizeSlug($data['license_type'] ?? $data['plan'] ?? '')
+            : SubscriptionPlan::normalizeSlug($data['license_type'] ?? $data['plan'] ?? '');
+        $plan = $this->resolvePlan($planSlug, $productLine);
         $orderType = $data['order_type'] ?? 'new';
         if (!in_array($orderType, ['new', 'renewal', 'upgrade'], true)) {
             $orderType = 'new';
@@ -46,47 +62,91 @@ class SubscriptionCheckout
             $stmt->execute([(int) $data['tenant_id']]);
             $current = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($current) {
-                $currentSlug = SubscriptionPlan::normalizeSlug($current['license_type'] ?? '');
-                if (SubscriptionPlan::planRank($planSlug) > SubscriptionPlan::planRank($currentSlug)) {
-                    $orderType = 'upgrade';
+                if (PharmaCommercial::isPharmaProductLine($productLine)) {
+                    $currentSlug = PharmaSubscriptionPlan::normalizeSlug($current['license_type'] ?? '');
+                    if (PharmaSubscriptionPlan::planRank($planSlug) > PharmaSubscriptionPlan::planRank($currentSlug)) {
+                        $orderType = 'upgrade';
+                    }
+                } else {
+                    $currentSlug = SubscriptionPlan::normalizeSlug($current['license_type'] ?? '');
+                    if (SubscriptionPlan::planRank($planSlug) > SubscriptionPlan::planRank($currentSlug)) {
+                        $orderType = 'upgrade';
+                    }
                 }
             }
         }
 
-        $amount = self::calculateAmount($planSlug, $orderType === 'renewal' ? 'renewal' : 'new');
+        $amount = self::calculateAmount(
+            $planSlug,
+            $orderType === 'renewal' ? 'renewal' : 'new',
+            $productLine
+        );
         if ($amount <= 0) {
             return ['success' => false, 'message' => 'Montant invalide pour ce type de licence.'];
         }
 
-        $prefix = $orderType === 'renewal' ? 'RENEW' : ($orderType === 'upgrade' ? 'UPG' : 'EFS');
+        $prefix = PharmaCommercial::isPharmaProductLine($productLine)
+            ? ($orderType === 'renewal' ? 'PHR-R' : ($orderType === 'upgrade' ? 'PHR-U' : 'PHR'))
+            : ($orderType === 'renewal' ? 'RENEW' : ($orderType === 'upgrade' ? 'UPG' : 'EFS'));
         $ref = $prefix . '-' . strtoupper($planSlug) . '-' . time() . '-' . bin2hex(random_bytes(3));
 
         $passwordPlain = !empty($data['password']) ? (string) $data['password'] : null;
         $passwordHash = $passwordPlain !== null ? password_hash($passwordPlain, PASSWORD_DEFAULT) : null;
 
-        $stmt = $this->pdo->prepare("
-            INSERT INTO subscription_orders
-            (ref_command, order_type, license_type, amount_xof, company_name, email, phone,
-             nom_utilisateur, password_hash, password_initial, nom_complet, tenant_id, payment_status, payment_provider)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'mobile_money')
-        ");
-        $stmt->execute([
-            $ref,
-            $orderType,
-            $planSlug,
-            $amount,
-            saas_sanitize($data['company_name'] ?? ''),
-            saas_sanitize($data['email'] ?? ''),
-            saas_sanitize($data['phone'] ?? ''),
-            saas_sanitize($data['nom_utilisateur'] ?? ''),
-            $passwordHash,
-            $passwordPlain,
-            saas_sanitize($data['nom_complet'] ?? ''),
-            !empty($data['tenant_id']) ? (int) $data['tenant_id'] : null,
-        ]);
+        $hasProductLine = $this->tableHasColumn('subscription_orders', 'product_line');
+        if ($hasProductLine) {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO subscription_orders
+                (ref_command, order_type, product_line, license_type, amount_xof, company_name, email, phone,
+                 nom_utilisateur, password_hash, password_initial, nom_complet, tenant_id, payment_status, payment_provider)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'mobile_money')
+            ");
+            $stmt->execute([
+                $ref,
+                $orderType,
+                $productLine,
+                $planSlug,
+                $amount,
+                saas_sanitize($data['company_name'] ?? ''),
+                saas_sanitize($data['email'] ?? ''),
+                saas_sanitize($data['phone'] ?? ''),
+                saas_sanitize($data['nom_utilisateur'] ?? ''),
+                $passwordHash,
+                $passwordPlain,
+                saas_sanitize($data['nom_complet'] ?? ''),
+                !empty($data['tenant_id']) ? (int) $data['tenant_id'] : null,
+            ]);
+        } else {
+            $stmt = $this->pdo->prepare("
+                INSERT INTO subscription_orders
+                (ref_command, order_type, license_type, amount_xof, company_name, email, phone,
+                 nom_utilisateur, password_hash, password_initial, nom_complet, tenant_id, payment_status, payment_provider)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'mobile_money')
+            ");
+            $stmt->execute([
+                $ref,
+                $orderType,
+                $planSlug,
+                $amount,
+                saas_sanitize($data['company_name'] ?? ''),
+                saas_sanitize($data['email'] ?? ''),
+                saas_sanitize($data['phone'] ?? ''),
+                saas_sanitize($data['nom_utilisateur'] ?? ''),
+                $passwordHash,
+                $passwordPlain,
+                saas_sanitize($data['nom_complet'] ?? ''),
+                !empty($data['tenant_id']) ? (int) $data['tenant_id'] : null,
+            ]);
+        }
 
         $orderId = (int) $this->pdo->lastInsertId();
-        $typeLabel = SubscriptionPlan::isLifetime($planSlug) ? 'licence à vie' : 'abonnement annuel';
+        $isLifetime = PharmaCommercial::isPharmaProductLine($productLine)
+            ? PharmaSubscriptionPlan::isLifetime($planSlug)
+            : SubscriptionPlan::isLifetime($planSlug);
+        $typeLabel = $isLifetime ? 'licence à vie' : 'abonnement annuel';
+        $brand = PharmaCommercial::isPharmaProductLine($productLine)
+            ? PharmaCommercial::brandName()
+            : (function_exists('platform_name') ? platform_name() : (defined('PLATFORM_NAME') ? PLATFORM_NAME : 'Se.Santé'));
 
         return [
             'success' => true,
@@ -94,7 +154,8 @@ class SubscriptionCheckout
             'ref_command' => $ref,
             'amount' => $amount,
             'plan' => $plan,
-            'item_name' => (function_exists('platform_name') ? platform_name() : (defined('PLATFORM_NAME') ? PLATFORM_NAME : 'Se.Santé')) . ' — ' . $plan['name_full'] . ' (' . $typeLabel . ')',
+            'product_line' => $productLine,
+            'item_name' => $brand . ' — ' . ($plan['name'] ?? 'Plan') . ' (' . $typeLabel . ')',
         ];
     }
 
@@ -256,14 +317,24 @@ class SubscriptionCheckout
 
     private function activateSubscription(array $order, bool $initParams = true): int
     {
-        $planSlug = SubscriptionPlan::normalizeSlug($order['license_type']);
-        $plan = SubscriptionPlan::get($planSlug);
+        $productLine = PharmaCommercial::normalizeProductLine($order['product_line'] ?? 'clinical');
+        $isPharma = PharmaCommercial::isPharmaProductLine($productLine);
+        $planSlug = $isPharma
+            ? PharmaSubscriptionPlan::normalizeSlug($order['license_type'])
+            : SubscriptionPlan::normalizeSlug($order['license_type']);
+        $plan = $this->resolvePlan($planSlug, $productLine);
         $subSvc = SubscriptionService::getInstance();
-        $isLifetime = SubscriptionPlan::isLifetime($planSlug);
+        $isLifetime = $isPharma
+            ? PharmaSubscriptionPlan::isLifetime($planSlug)
+            : SubscriptionPlan::isLifetime($planSlug);
 
         if (!empty($order['tenant_id'])) {
             $tenantId = (int) $order['tenant_id'];
-            $subSvc->syncTenantToPlan($tenantId, $planSlug, $this->pdo);
+            if ($isPharma) {
+                PharmaCommercial::syncTenantPlan($tenantId, $planSlug, $this->pdo);
+            } else {
+                $subSvc->syncTenantToPlan($tenantId, $planSlug, $this->pdo);
+            }
 
             if ($isLifetime) {
                 $this->pdo->prepare("
@@ -281,10 +352,18 @@ class SubscriptionCheckout
                            is_demo = 0, auto_renew = 1, updated_at = NOW() WHERE id = ?
                 ")->execute([$newExpires, $planSlug, $tenantId]);
             }
+            if ($isPharma) {
+                PharmaCommercial::activateSuiteForTenant(
+                    $tenantId,
+                    null,
+                    'Activation automatique — abonnement PharmaPro confirmé'
+                );
+            }
             return $tenantId;
         }
 
-        $tenantKey = 'EFS-' . strtoupper(bin2hex(random_bytes(4))) . '-' . strtoupper(bin2hex(random_bytes(2)));
+        $tenantPrefix = $isPharma ? 'PHR' : 'EFS';
+        $tenantKey = $tenantPrefix . '-' . strtoupper(bin2hex(random_bytes(4))) . '-' . strtoupper(bin2hex(random_bytes(2)));
         $expiresAt = $isLifetime ? null : date('Y-m-d', strtotime('+1 year'));
 
         $stmt = $this->pdo->prepare("
@@ -302,7 +381,11 @@ class SubscriptionCheckout
             $isLifetime ? 0 : 1,
         ]);
         $tenantId = (int) $this->pdo->lastInsertId();
-        $subSvc->syncTenantToPlan($tenantId, $planSlug, $this->pdo);
+        if ($isPharma) {
+            PharmaCommercial::syncTenantPlan($tenantId, $planSlug, $this->pdo);
+        } else {
+            $subSvc->syncTenantToPlan($tenantId, $planSlug, $this->pdo);
+        }
 
         $username = $order['nom_utilisateur'] ?: $this->generateUsername($order['email']);
         $this->pdo->prepare("
@@ -319,6 +402,14 @@ class SubscriptionCheckout
 
         if ($initParams) {
             $this->initTenantParameters($tenantId, $order['company_name']);
+        }
+
+        if ($isPharma) {
+            PharmaCommercial::activateSuiteForTenant(
+                $tenantId,
+                null,
+                'Activation automatique — abonnement PharmaPro confirmé'
+            );
         }
 
         return $tenantId;

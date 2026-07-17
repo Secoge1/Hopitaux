@@ -3,7 +3,6 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/app_module_layout.php';
 extract(app_module_context('paiements'));
 
-require_once '../includes/init.php';
 require_once '../includes/currency_helper.php';
 require_once '../models/Paiement.php';
 require_once '../models/Patient.php';
@@ -66,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Erreur lors de la modification du paiement.";
             $messageType = "danger";
         }
-    } catch (RuntimeException $e) {
+    } catch (Throwable $e) {
         $error = $e->getMessage();
         $messageType = "danger";
     }
@@ -162,24 +161,15 @@ app_module_flash();
         </div>
 
         <!-- Messages d'alerte -->
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <?php echo htmlspecialchars($error); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-        <?php if (isset($message)): ?>
-            <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
-                <i class="fas fa-<?php echo $messageType === 'success' ? 'check-circle' : 'exclamation-triangle'; ?> me-2"></i>
-                <?php echo $message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php elseif (!empty($message)): ?>
+            <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
+                <i class="fas fa-<?php echo $messageType === 'success' ? 'check-circle' : 'exclamation-triangle'; ?> me-2"></i>
+                <?php echo $message; ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>

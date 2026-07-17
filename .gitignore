@@ -16,6 +16,8 @@ efficasante_web/dist/
 .env.local
 *.env
 !/efficasante_web/.env.example
+config/db.pharma.production.php
+config/db.local.php
 /uploads/
 /web_upload/
 /backups/

@@ -16,6 +16,8 @@ if (!defined('APP_ROLE_LABELS')) {
         'secretaire'  => 'Secrétaire',
         'comptable'   => 'Comptable',
         'pharmacien'  => 'Pharmacien',
+        'pharma_manager' => 'Gérant PharmaPro',
+        'pharma_cashier' => 'Caissier PharmaPro',
         'laborantin'  => 'Laborantin',
         'major'       => 'Major',
         'technicien'  => 'Technicien',
@@ -32,6 +34,7 @@ if (!defined('MODULE_ROLES')) {
         'paiements'     => ['admin', 'secretaire', 'comptable'],
         'personnel'     => ['admin', 'secretaire'],
         'pharmacie'     => ['admin', 'medecin', 'pharmacien'],
+        'pharma_erp'    => ['admin', 'pharmacien', 'comptable', 'pharma_manager', 'pharma_cashier'],
         'finances'      => ['admin', 'comptable', 'secretaire'],
         'assurances'    => ['admin', 'secretaire'],
         'communication' => ['admin', 'medecin', 'sage_femme', 'infirmier', 'secretaire', 'comptable', 'pharmacien', 'laborantin', 'major', 'technicien'],
@@ -114,6 +117,14 @@ if (!function_exists('app_nav_item_visible')) {
         if (!empty($item['admin_only']) && !$auth->estAdmin()) {
             return false;
         }
+        if (!empty($item['feature'])) {
+            if (!function_exists('tenant_feature_enabled')) {
+                require_once __DIR__ . '/saas/saas_helpers.php';
+            }
+            if (!tenant_feature_enabled((string) $item['feature'])) {
+                return false;
+            }
+        }
         if (!empty($item['module'])) {
             return $auth->aAccesModule((string) $item['module']);
         }
@@ -170,6 +181,7 @@ if (!function_exists('app_module_labels')) {
             'paiements'     => 'Paiements',
             'personnel'     => 'Personnel',
             'pharmacie'     => 'Pharmacie',
+            'pharma_erp'    => 'PharmaPro ERP',
             'finances'      => 'Finances',
             'assurances'    => 'Assurances',
             'communication' => 'Communication',
@@ -260,6 +272,8 @@ if (!function_exists('app_role_doc_entries')) {
             'secretaire' => 'fa-user-tie',
             'comptable'  => 'fa-calculator',
             'pharmacien' => 'fa-pills',
+            'pharma_manager' => 'fa-prescription-bottle-medical',
+            'pharma_cashier' => 'fa-cash-register',
             'laborantin' => 'fa-vial',
             'major'      => 'fa-user-graduate',
             'technicien' => 'fa-wrench',
@@ -272,6 +286,8 @@ if (!function_exists('app_role_doc_entries')) {
             'secretaire' => 'Rendez-vous, paiements, personnel, finances, assurances, dossiers administratifs et communication.',
             'comptable'  => 'Paiements (création, modification, suppression), finances complètes (écritures, comptes, budgets, validation, bilan).',
             'pharmacien' => 'Gestion pharmacie : stocks, commandes et mouvements de médicaments.',
+            'pharma_manager' => 'PharmaPro ERP complet : POS, stock, achats, comptabilité SYSCOHADA, RH et paramètres.',
+            'pharma_cashier' => 'PharmaPro caisse : point de vente, ventes et scan codes-barres uniquement.',
             'laborantin' => 'Saisie et suivi des analyses de laboratoire, résultats et file d\'attente.',
             'major'      => 'Supervision du laboratoire : toutes les analyses de l\'établissement, validation et assignation des techniciens.',
             'technicien' => 'Maintenance des équipements, interventions et suivi technique.',

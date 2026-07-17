@@ -82,7 +82,13 @@ if (!function_exists('doc_module_groups')) {
                     [
                         'name' => 'Pharmacie & stocks',
                         'icon' => 'fa-pills',
-                        'desc' => 'Médicaments, mouvements de stock, alertes de rupture et dates de péremption.',
+                        'desc' => 'Médicaments, mouvements de stock, alertes de rupture et dates de péremption (module HIS).',
+                    ],
+                    [
+                        'name' => 'PharmaPro ERP',
+                        'icon' => 'fa-cash-register',
+                        'badge' => 'Add-on bêta',
+                        'desc' => 'ERP officine premium activé par l\'admin plateforme : POS scanner, achats, stock lots FEFO, comptabilité SYSCOHADA, RH, pont Finances HIS, API mobile caisse et rapports PDF.',
                     ],
                     [
                         'name' => 'Personnel & RH',
@@ -235,12 +241,19 @@ if (!function_exists('doc_module_groups')) {
     {
         return [
             'title' => 'Synchronisation Paiements · Finances · Analyses',
+            'tagline' => 'Consultation, labo, caisse et compta reliés en un seul flux.',
             'summary' => 'Lie consultations et analyses aux paiements, écritures comptables automatiques et encaissement unifié.',
             'steps' => [
                 'Générez un paiement depuis une fiche consultation ou analyse laboratoire',
                 'Au statut Payé, l\'écriture comptable est créée automatiquement dans Finances',
                 'Les encaissements validés sont verrouillés — toute annulation produit une contre-passation',
                 'Un bandeau « Nouveau » informe l\'équipe à la première connexion (web, PWA et app Flutter)',
+            ],
+            'flash' => [
+                ['icon' => 'fa-stethoscope', 'title' => 'Depuis la consultation', 'text' => 'Générez le paiement en un clic depuis la fiche patient ou consultation.'],
+                ['icon' => 'fa-flask', 'title' => 'Depuis le laboratoire', 'text' => 'Même flux pour les analyses : ticket caisse puis facturation.'],
+                ['icon' => 'fa-book', 'title' => 'Comptabilité auto', 'text' => 'Au statut Payé, l\'écriture est créée dans Finances sans ressaisie.'],
+                ['icon' => 'fa-shield-alt', 'title' => 'Encaissement sécurisé', 'text' => 'Paiements validés verrouillés ; annulation = contre-passation tracée.'],
             ],
             'activation' => 'Activée par l\'administrateur plateforme pour chaque établissement (Admin plateforme → Fonctionnalités).',
         ];

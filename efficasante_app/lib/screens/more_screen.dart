@@ -1,9 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../services/pharma_api_service.dart';
+import '../services/biometric_service.dart';
+import 'pharma/pharma_shell_screen.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+  bool? _pharmaAccess;
+  bool _checkingPharma = false;
+  bool _biometricAvailable = false;
+  bool _biometricBusy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPharmaAccess();
+    _checkBiometric();
+  }
+
+  Future<void> _checkBiometric() async {
+    final ok = await BiometricService().canCheckBiometrics();
+    if (mounted) setState(() => _biometricAvailable = ok);
+  }
+
+  Future<void> _checkPharmaAccess() async {
+    if (!PharmaApiService().roleMayAccess) {
+      setState(() => _pharmaAccess = false);
+      return;
+    }
+    setState(() => _checkingPharma = true);
+    try {
+      final ok = await PharmaApiService().hasAccess();
+      if (mounted) setState(() => _pharmaAccess = ok);
+    } catch (_) {
+      if (mounted) setState(() => _pharmaAccess = false);
+    } finally {
+      if (mounted) setState(() => _checkingPharma = false);
+    }
+  }
+
+  Future<void> _openPharma(BuildContext context) async {
+    if (_pharmaAccess != true) {
+      _showPharmaUnavailable(context);
+      return;
+    }
+    if (!context.mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const PharmaShellScreen()),
+    );
+  }
+
+  void _showPharmaUnavailable(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('PharmaPro ERP'),
+        content: const Text(
+          'Ce module n\'est pas disponible pour votre compte.\n\n'
+          'Vérifiez que PharmaPro ERP est activé par l\'administrateur plateforme '
+          'et que votre rôle est admin, pharmacien ou comptable.',
+        ),
+        actions: [
+          FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +96,7 @@ class MoreScreen extends StatelessWidget {
                     ),
                   ),
                   title: Text(auth.userDisplayName),
-                  subtitle: Text('${auth.userRole}'),
+                  subtitle: Text(auth.userRole),
                 ),
               ),
             ),
@@ -49,8 +118,18 @@ class MoreScreen extends StatelessWidget {
           ),
           _MenuItem(
             icon: Icons.medication,
-            label: 'Pharmacie',
-            onTap: () => _showComingSoon(context, 'Pharmacie'),
+            label: 'PharmaPro ERP',
+            subtitle: _pharmaSubtitle(),
+            trailing: _checkingPharma
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : _pharmaAccess == true
+                    ? null
+                    : Icon(Icons.lock_outline, color: Colors.grey.shade500, size: 20),
+            onTap: () => _openPharma(context),
           ),
           _MenuItem(
             icon: Icons.account_balance_wallet,
@@ -62,6 +141,22 @@ class MoreScreen extends StatelessWidget {
             label: 'Paramètres',
             onTap: () => _showComingSoon(context, 'Paramètres'),
           ),
+          if (_biometricAvailable)
+            Consumer<AuthNotifier>(
+              builder: (_, auth, __) => SwitchListTile(
+                secondary: const Icon(Icons.fingerprint),
+                title: const Text('Déverrouillage biométrique'),
+                subtitle: const Text('Empreinte ou Face ID au lancement'),
+                value: auth.biometricEnabled,
+                onChanged: _biometricBusy
+                    ? null
+                    : (v) async {
+                        setState(() => _biometricBusy = true);
+                        await auth.setBiometricEnabled(v);
+                        if (mounted) setState(() => _biometricBusy = false);
+                      },
+              ),
+            ),
           const Divider(height: 24),
           _MenuItem(
             icon: Icons.logout,
@@ -95,12 +190,18 @@ class MoreScreen extends StatelessWidget {
     );
   }
 
+  String? _pharmaSubtitle() {
+    if (_checkingPharma) return 'Vérification…';
+    if (_pharmaAccess == true) return 'Caisse, stock, dashboard officine';
+    return 'Non activé ou rôle insuffisant';
+  }
+
   void _showComingSoon(BuildContext context, String module) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(module),
-        content: Text(
+        content: const Text(
           'Ce module sera disponible dans une prochaine mise à jour. '
           'En attendant, utilisez la version web sur votre navigateur.',
         ),
@@ -118,14 +219,18 @@ class MoreScreen extends StatelessWidget {
 class _MenuItem extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String? subtitle;
   final VoidCallback onTap;
   final Color? textColor;
+  final Widget? trailing;
 
   const _MenuItem({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.subtitle,
     this.textColor,
+    this.trailing,
   });
 
   @override
@@ -133,7 +238,8 @@ class _MenuItem extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: textColor ?? Theme.of(context).colorScheme.primary),
       title: Text(label, style: TextStyle(color: textColor)),
-      trailing: const Icon(Icons.chevron_right),
+      subtitle: subtitle != null ? Text(subtitle!) : null,
+      trailing: trailing ?? const Icon(Icons.chevron_right),
       onTap: onTap,
     );
   }

@@ -1,20 +1,33 @@
 <?php
 /**
- * Souscription SaaS — abonnement annuel ou licence à vie.
+ * Souscription SaaS — abonnement annuel ou licence à vie (Se.Santé ou PharmaPro).
  */
 require_once __DIR__ . '/includes/public_layout.php';
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/config/Auth.php';
 require_once __DIR__ . '/includes/saas/SubscriptionPlan.php';
+require_once __DIR__ . '/includes/saas/PharmaSubscriptionPlan.php';
+require_once __DIR__ . '/includes/saas/PharmaCommercial.php';
 require_once __DIR__ . '/includes/saas/SubscriptionCheckout.php';
 require_once __DIR__ . '/includes/saas/SubscriptionService.php';
 require_once __DIR__ . '/includes/saas/saas_helpers.php';
 
 public_init();
 
-$planSlug = SubscriptionPlan::normalizeSlug($_GET['plan'] ?? $_POST['plan'] ?? SubscriptionPlan::ANNUAL);
-$plan = SubscriptionPlan::get($planSlug);
-$amount = SubscriptionCheckout::calculateAmount($planSlug);
+$productLine = PharmaCommercial::normalizeProductLine(
+    $_GET['product'] ?? $_POST['product'] ?? 'clinical'
+);
+$isPharma = PharmaCommercial::isPharmaProductLine($productLine);
+
+if ($isPharma) {
+    $planSlug = PharmaSubscriptionPlan::normalizeSlug($_GET['plan'] ?? $_POST['plan'] ?? PharmaSubscriptionPlan::ANNUAL);
+    $plan = PharmaSubscriptionPlan::get($planSlug);
+    $amount = SubscriptionCheckout::calculateAmount($planSlug, 'new', $productLine);
+} else {
+    $planSlug = SubscriptionPlan::normalizeSlug($_GET['plan'] ?? $_POST['plan'] ?? SubscriptionPlan::ANNUAL);
+    $plan = SubscriptionPlan::get($planSlug);
+    $amount = SubscriptionCheckout::calculateAmount($planSlug, 'new', $productLine);
+}
 
 $error = '';
 $auth = Auth::getInstance();
@@ -22,7 +35,10 @@ $isLoggedIn = $auth->estConnecte();
 $subSvc = SubscriptionService::getInstance();
 $subSvc->loadForSession();
 $currentPlan = $isLoggedIn ? $subSvc->getPlanSlug() : '';
-$isUpgrade = $isLoggedIn && SubscriptionPlan::planRank($planSlug) > SubscriptionPlan::planRank($currentPlan);
+$planRankFn = $isPharma
+    ? [PharmaSubscriptionPlan::class, 'planRank']
+    : [SubscriptionPlan::class, 'planRank'];
+$isUpgrade = $isLoggedIn && $planRankFn($planSlug) > $planRankFn($currentPlan);
 
 $prefill = [];
 if ($isLoggedIn) {
@@ -42,13 +58,14 @@ if ($isLoggedIn) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = [
+        'product_line' => $productLine,
         'license_type' => $planSlug,
         'company_name' => trim($_POST['company_name'] ?? ''),
         'email' => trim($_POST['email'] ?? ''),
         'phone' => trim($_POST['phone'] ?? ''),
         'nom_complet' => trim($_POST['nom_complet'] ?? ''),
         'tenant_id' => $isLoggedIn ? $auth->getTenantId() : null,
-        'order_type' => $isUpgrade ? 'upgrade' : ($isLoggedIn && SubscriptionPlan::isAnnual($planSlug) && $planSlug === $currentPlan ? 'renewal' : 'new'),
+        'order_type' => $isUpgrade ? 'upgrade' : ($isLoggedIn && !$isPharma && SubscriptionPlan::isAnnual($planSlug) && $planSlug === $currentPlan ? 'renewal' : 'new'),
     ];
 
     if (!$isLoggedIn) {
@@ -57,7 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirm = $_POST['password_confirm'] ?? '';
 
         if ($data['company_name'] === '' || $data['email'] === '') {
-            $error = 'Veuillez renseigner le nom de l\'établissement et l\'email.';
+            $error = $isPharma
+                ? 'Veuillez renseigner le nom de la pharmacie et l\'email.'
+                : 'Veuillez renseigner le nom de l\'établissement et l\'email.';
         } elseif ($data['nom_utilisateur'] === '' || $data['password'] === '') {
             $error = 'Veuillez choisir un identifiant et un mot de passe administrateur.';
         } elseif ($data['password'] !== $confirm) {
@@ -66,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Le mot de passe doit contenir au moins 6 caractères.';
         }
     } elseif ($data['company_name'] === '' || $data['email'] === '') {
-        $error = 'Veuillez renseigner le nom de l\'établissement et l\'email.';
+        $error = $isPharma
+            ? 'Veuillez renseigner le nom de la pharmacie et l\'email.'
+            : 'Veuillez renseigner le nom de l\'établissement et l\'email.';
     }
 
     if ($error === '') {
@@ -88,32 +109,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = $isUpgrade ? 'Passer à la licence à vie' : 'Souscrire — ' . $plan['name'];
-public_head($pageTitle . ' — ' . platform_name(), 'pub-subscribe');
-public_nav('tarifs');
-public_hero($pageTitle, '', true);
+$pageTitle = $isUpgrade
+    ? 'Passer à une formule supérieure'
+    : ($isPharma ? 'Souscrire — ' . $plan['name'] : 'Souscrire — ' . $plan['name']);
+$tarifsBackUrl = $isPharma ? public_url('tarifs_pharma.php') : public_url('tarifs.php');
+$isLifetimePlan = $isPharma
+    ? PharmaSubscriptionPlan::isLifetime($planSlug)
+    : SubscriptionPlan::isLifetime($planSlug);
+
+public_head(
+    $pageTitle . ' — ' . ($isPharma ? PharmaCommercial::brandName() : platform_name()),
+    $isPharma ? 'pub-subscribe pub-pharma-page' : 'pub-subscribe',
+    $isPharma ? ['assets/css/pharma-public.css'] : []
+);
+public_nav($isPharma ? 'pharma' : 'tarifs');
+public_hero($pageTitle, $isPharma ? 'Activation PharmaPro sous 24 h après paiement Mobile Money' : '', true);
 ?>
 
 <section class="pub-main">
     <div class="container pub-main-narrow">
-        <a href="<?= public_url('tarifs.php') ?>" class="pub-back-link">
+        <a href="<?= htmlspecialchars($tarifsBackUrl) ?>" class="pub-back-link">
             <i class="fas fa-arrow-left"></i> Retour aux tarifs
         </a>
 
         <div class="pub-card">
             <div class="pub-card-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <?php if ($isPharma): ?>
+                <p class="text-muted small mb-0"><?= htmlspecialchars(PharmaCommercial::brandName()) ?> — ERP officine autonome</p>
+                <?php endif; ?>
             </div>
             <div class="pub-card-body">
                 <div class="pub-alert-info">
                     <strong>Montant :</strong> <?= saas_format_amount($amount) ?>
-                    <?php if (SubscriptionPlan::isLifetime($planSlug)): ?>
+                    <?php if ($isLifetimePlan): ?>
                     <span class="text-muted">(paiement unique)</span>
                     <?php else: ?>
                     <span class="text-muted">(abonnement 12 mois)</span>
                     <?php endif; ?>
                     <br><span class="text-muted" style="font-size:0.88rem;">
+                        <?php if ($isPharma): ?>
+                        Inclus : POS, stocks, achats, comptabilité SYSCOHADA, mises à jour, sauvegardes et support.
+                        PharmaPro ERP est activé automatiquement dès confirmation du paiement.
+                        <?php else: ?>
                         Inclus : sync Paiements · Finances · Analyses (activée pour votre établissement après souscription).
+                        <?php endif; ?>
                     </span>
                 </div>
 
@@ -123,9 +163,10 @@ public_hero($pageTitle, '', true);
 
                 <form method="post">
                     <input type="hidden" name="plan" value="<?= htmlspecialchars($planSlug) ?>">
+                    <input type="hidden" name="product" value="<?= htmlspecialchars($productLine) ?>">
 
                     <div class="pub-field">
-                        <label>Nom de l'établissement *</label>
+                        <label><?= $isPharma ? 'Nom de la pharmacie *' : 'Nom de l\'établissement *' ?></label>
                         <input type="text" name="company_name" required
                                value="<?= htmlspecialchars($_POST['company_name'] ?? $prefill['company_name'] ?? '') ?>">
                     </div>
@@ -148,7 +189,7 @@ public_hero($pageTitle, '', true);
 
                     <?php if (!$isLoggedIn): ?>
                     <hr class="my-4">
-                    <p class="text-muted small mb-3">Compte administrateur de l'établissement</p>
+                    <p class="text-muted small mb-3"><?= $isPharma ? 'Compte gérant PharmaPro' : 'Compte administrateur de l\'établissement' ?></p>
                     <div class="pub-field">
                         <label>Identifiant *</label>
                         <input type="text" name="nom_utilisateur" required

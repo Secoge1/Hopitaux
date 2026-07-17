@@ -8,6 +8,9 @@
  *   DB_NAME = cp2640311p29_efficasante
  *   DB_USER = cp2640311p29
  *   DB_PASS = votre_mot_de_passe
+ *
+ * PharmaPro production (pharmasmart.secogesarl.com) :
+ *   Copier config/db.pharma.production.example.php → config/db.pharma.production.php
  */
 
 if (!defined('DB_HOST')) {

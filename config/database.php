@@ -15,20 +15,28 @@ if (!class_exists('Database')) {
     if (file_exists($prodFile)) {
         require_once $prodFile;
     } else {
-        // Sinon, créer la classe avec la config locale
+        // Configuration via constantes DB_* (db.php / db.pharma.production.php)
         class Database {
-            private $host = 'localhost';
-            private $db_name = 'cp2640311p29_efficasante';
-            private $username = 'root';
-            private $password = '';
+            private $host;
+            private $db_name;
+            private $username;
+            private $password;
             private $conn;
+
+            public function __construct()
+            {
+                $this->host = defined('DB_HOST') ? DB_HOST : 'localhost';
+                $this->db_name = defined('DB_NAME') ? DB_NAME : 'cp2640311p29_efficasante';
+                $this->username = defined('DB_USER') ? DB_USER : 'root';
+                $this->password = defined('DB_PASS') ? DB_PASS : '';
+            }
 
             public function getConnection() {
                 $this->conn = null;
 
                 try {
                     $this->conn = new PDO(
-                        "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8",
+                        "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
                         $this->username,
                         $this->password
                     );

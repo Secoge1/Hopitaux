@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import '../services/biometric_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,6 +43,34 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = false);
     if (!ok) {
       setState(() => _error = 'Email ou mot de passe incorrect.');
+      return;
+    }
+    await _offerBiometric(auth);
+  }
+
+  Future<void> _offerBiometric(AuthNotifier auth) async {
+    if (auth.biometricEnabled) return;
+    final bio = BiometricService();
+    if (!await bio.canCheckBiometrics()) return;
+    if (!mounted) return;
+
+    final label = await bio.biometricLabel();
+    final enable = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Activer $label ?'),
+        content: Text(
+          'Déverrouillez l\'application plus rapidement au prochain lancement '
+          'sans resaisir votre mot de passe.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Plus tard')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Activer')),
+        ],
+      ),
+    );
+    if (enable == true && mounted) {
+      await auth.setBiometricEnabled(true);
     }
   }
 

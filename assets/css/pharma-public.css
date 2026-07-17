@@ -1,0 +1,240 @@
+/* PharmaPro ERP — pages publiques (tarifs, souscription) */
+
+.pub-pharma-page {
+    --pharma-primary: #0d7a4f;
+    --pharma-primary-dark: #065a38;
+    --pharma-accent: #12a86b;
+    --pharma-soft: #e8f7ef;
+    --pharma-gold: #f0b429;
+}
+
+.pub-pharma-hero {
+    background: linear-gradient(135deg, #043d28 0%, var(--pharma-primary) 45%, var(--pharma-accent) 100%);
+    color: #fff;
+    padding: 4.5rem 0 3.5rem;
+}
+
+.pub-pharma-eyebrow {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pharma-gold);
+    margin-bottom: 0.75rem;
+}
+
+.pub-pharma-hero h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.pub-pharma-lead {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    margin-bottom: 0.75rem;
+}
+
+.pub-pharma-sub {
+    opacity: 0.88;
+    max-width: 38rem;
+}
+
+.pub-pharma-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.pub-pharma-btn-primary,
+.pub-pharma-btn-primary.btn {
+    background: var(--pharma-gold);
+    border: none;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.pub-pharma-btn-primary:hover,
+.pub-pharma-btn-primary.btn:hover {
+    background: #ffc94d;
+    color: #111;
+}
+
+.pub-pharma-btn-outline,
+.pub-pharma-btn-outline.btn {
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    color: #fff;
+    background: transparent;
+    font-weight: 600;
+}
+
+.pub-pharma-btn-outline:hover,
+.pub-pharma-btn-outline.btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: #fff;
+}
+
+.pub-pharma-hero-panel {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(6px);
+}
+
+.pub-pharma-panel-title {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.pub-pharma-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pub-pharma-feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 0;
+}
+
+.pub-pharma-feature-list i {
+    width: 1.25rem;
+    color: var(--pharma-gold);
+}
+
+.pub-pharma-section-title {
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.pub-pharma-module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.85rem;
+}
+
+.pub-pharma-module-card {
+    background: #fff;
+    border: 1px solid #dcefe4;
+    border-radius: 12px;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(13, 122, 79, 0.06);
+}
+
+.pub-pharma-module-card i {
+    display: block;
+    font-size: 1.35rem;
+    color: var(--pharma-primary);
+    margin-bottom: 0.45rem;
+}
+
+.pub-pharma-module-card span {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #234;
+}
+
+.pub-pharma-offers {
+    background: var(--pharma-soft);
+}
+
+.pub-pharma-pricing .saas-plan-card {
+    border-color: #cfe8da;
+}
+
+.pub-pharma-pricing .saas-plan-popular {
+    border-color: var(--pharma-primary);
+    box-shadow: 0 8px 30px rgba(13, 122, 79, 0.18);
+}
+
+.pub-pharma-pricing .saas-price {
+    color: var(--pharma-primary-dark);
+}
+
+.pub-pharma-badge,
+.pub-pharma-pricing .saas-badge {
+    background: var(--pharma-primary);
+}
+
+.pub-pharma-trust-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    height: 100%;
+    border: 1px solid #e5efe9;
+}
+
+.pub-pharma-trust-card i {
+    font-size: 1.6rem;
+    color: var(--pharma-primary);
+    margin-bottom: 0.75rem;
+}
+
+.pub-pharma-trust-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.pub-pharma-contact {
+    background: linear-gradient(180deg, #fff 0%, var(--pharma-soft) 100%);
+}
+
+.pub-pharma-contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pub-pharma-contact-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+}
+
+.pub-pharma-contact-list i {
+    color: var(--pharma-primary);
+    width: 1.1rem;
+}
+
+.pub-pharma-qr-card {
+    display: inline-block;
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 10px 30px rgba(13, 122, 79, 0.12);
+    border: 1px solid #dcefe4;
+}
+
+.pub-pharma-qr-label {
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--pharma-primary-dark);
+    margin-top: 0.75rem;
+}
+
+.pub-pharma-how .pub-how-eyebrow {
+    color: var(--pharma-primary);
+}
+
+.pub-pharma-how .pub-how-step-icon {
+    background: var(--pharma-soft);
+    color: var(--pharma-primary);
+}
+
+.pub-pharma-how .pub-how-step-num {
+    background: var(--pharma-primary);
+}
+
+@media (max-width: 767px) {
+    .pub-pharma-hero {
+        padding-top: 3rem;
+    }
+}

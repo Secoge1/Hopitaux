@@ -64,11 +64,12 @@
     border: 1px solid var(--app-border, #e2e8f0);
     box-shadow: none;
     border-radius: 12px;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .fin-panel-body .app-mod-table-wrap .table-responsive {
-    overflow: visible;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .fin-compte-cell {
@@ -181,6 +182,11 @@
     .fin-compte-cell {
         max-width: none;
     }
+
+    /* Évite une hauteur figée qui bloque le défilement vertical */
+    .fin-panel.h-100 {
+        height: auto !important;
+    }
 }
 
 @media (max-width: 767.98px) {
@@ -191,6 +197,25 @@
 
     .fin-panel-body {
         padding: 0.85rem;
+    }
+
+    .fin-panel-body .app-mod-table-wrap {
+        max-width: 100%;
+        touch-action: pan-x pan-y;
+    }
+
+    .fin-panel-body .app-mod-table-wrap .table-responsive {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    .fin-panel-body .mod-list-table {
+        min-width: 640px;
     }
 }
 

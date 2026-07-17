@@ -49,7 +49,10 @@ foreach ($files as $f) {
 }
 
 tcheck(class_exists('EscPosPrinter'), 'Classe EscPosPrinter');
-tcheck(function_exists('thermal_ticket_build_escpos'), 'thermal_ticket_build_escpos()');
+tcheck(function_exists('thermal_printer_normalize_paper_mm'), 'thermal_printer_normalize_paper_mm()');
+tcheck(function_exists('thermal_printer_printable_width_mm'), 'thermal_printer_printable_width_mm()');
+tcheck(thermal_printer_normalize_paper_mm(80) === 80 && thermal_printer_normalize_paper_mm(58) === 58, 'Normalisation 80/58 mm');
+tcheck(thermal_printer_printable_width_mm(80) === 72 && thermal_printer_printable_width_mm(58) === 48, 'Zone imprimable 72/48 mm');
 tcheck(function_exists('thermal_ticket_render_html'), 'thermal_ticket_render_html()');
 tcheck(function_exists('thermal_ticket_load_data'), 'thermal_ticket_load_data()');
 
@@ -87,6 +90,7 @@ tcheck(strlen($esc) > 100 && stripos($esc, 'TICKET') !== false, 'Ticket ESC/POS 
 $html = thermal_ticket_render_html($fakeData, false);
 tcheck(strpos($html, 'thermal-receipt') !== false && strpos($html, 'CONS202606080001') !== false, 'Aperçu HTML 80 mm');
 tcheck(strpos($html, 'thermal-logo') !== false && strpos($html, '<img') !== false, 'Aperçu HTML — logo établissement');
+tcheck(strpos($html, '--thermal-printable-mm') !== false, 'Aperçu HTML — zone imprimable 72 mm');
 
 require_once $base . '/includes/staff_scope.php';
 require_once $base . '/models/Patient.php';

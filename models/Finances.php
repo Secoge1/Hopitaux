@@ -8,6 +8,13 @@ require_once __DIR__ . '/../includes/saas/TenantScope.php';
 
 class Finances {
 
+    private static function rollbackIfActive(PDO $pdo): void
+    {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+    }
+
     private function scopeTenant(PDO $pdo, array &$where, array &$params, string $table = 'comptes_comptables', string $alias = ''): void
     {
         TenantScope::appendWhere($pdo, $table, $where, $params, $alias);
@@ -453,7 +460,7 @@ class Finances {
             return $ecriture_id;
             
         } catch (Exception $e) {
-            $pdo->rollBack();
+            self::rollbackIfActive($pdo);
             throw $e;
         }
     }
@@ -492,7 +499,7 @@ class Finances {
             return true;
             
         } catch (Exception $e) {
-            $pdo->rollBack();
+            self::rollbackIfActive($pdo);
             throw $e;
         }
     }
@@ -549,7 +556,7 @@ class Finances {
             return $result;
             
         } catch (Exception $e) {
-            $pdo->rollBack();
+            self::rollbackIfActive($pdo);
             throw $e;
         }
     }
@@ -619,7 +626,7 @@ class Finances {
             return true;
             
         } catch (Exception $e) {
-            $pdo->rollBack();
+            self::rollbackIfActive($pdo);
             throw $e;
         }
     }

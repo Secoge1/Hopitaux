@@ -4,6 +4,17 @@
  * Inclure ce fichier au début de chaque page pour activer toutes les fonctionnalités
  */
 
+ini_set('default_charset', 'UTF-8');
+if (function_exists('mb_internal_encoding')) {
+    mb_internal_encoding('UTF-8');
+}
+if (function_exists('mb_http_output')) {
+    mb_http_output('UTF-8');
+}
+if (PHP_SAPI !== 'cli' && !headers_sent() && !defined('APP_SKIP_HTML_CONTENT_TYPE')) {
+    header('Content-Type: text/html; charset=UTF-8');
+}
+
 // Démarrer la session si elle n'est pas déjà démarrée
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
@@ -11,6 +22,19 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Charger la configuration de base de données en premier
 require_once __DIR__ . '/../config/db.php';
+
+if (
+    defined('APP_FORCE_HTTPS') && APP_FORCE_HTTPS
+    && PHP_SAPI !== 'cli'
+    && !headers_sent()
+    && empty($_SERVER['HTTPS'])
+    && strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) !== 'https'
+) {
+    $host = $_SERVER['HTTP_HOST'] ?? 'pharmasmart.secogesarl.com';
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    header('Location: https://' . $host . $uri, true, 301);
+    exit;
+}
 
 // Fuseau horaire — réglé après chargement SaaS (paramètres par tenant)
 
@@ -442,7 +466,14 @@ if (!defined('IS_MOBILE_LAYOUT')) {
     $mobileAuto = !$quitMobile && !$mobileParam
         && function_exists('pwa_is_mobile_device') && pwa_is_mobile_device();
 
-    define('IS_MOBILE_LAYOUT', $mobileParam || $mobileCookie || $pwaStandalone || $mobileAuto);
+    $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $pharmaStandalone = (strpos($script, '/pharma_erp/') !== false)
+        || (defined('PHARMA_ERP_STANDALONE') && PHARMA_ERP_STANDALONE);
+    if ($pharmaStandalone && !defined('PHARMA_ERP_STANDALONE')) {
+        define('PHARMA_ERP_STANDALONE', true);
+    }
+
+    define('IS_MOBILE_LAYOUT', !$pharmaStandalone && ($mobileParam || $mobileCookie || $pwaStandalone || $mobileAuto));
 
     if (IS_MOBILE_LAYOUT && !headers_sent()) {
         $_SESSION['mobile_mode'] = true;
@@ -460,7 +491,7 @@ if (!defined('BASE_PATH')) {
 }
 
 // Fallback OB si le chrome PWA n'a pas été rendu par app_layout
-if (defined('IS_MOBILE_LAYOUT') && IS_MOBILE_LAYOUT && function_exists('mobile_layout_inject_html')) {
+if (defined('IS_MOBILE_LAYOUT') && IS_MOBILE_LAYOUT && function_exists('mobile_layout_inject_html') && !defined('PHARMA_ERP_STANDALONE')) {
     ob_start(static function ($html) {
         try {
             return mobile_layout_inject_html($html);

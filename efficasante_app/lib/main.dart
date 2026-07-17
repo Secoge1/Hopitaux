@@ -42,7 +42,7 @@ class EfficasanteApp extends StatelessWidget {
               statusBarIconBrightness: Brightness.dark,
             ),
           ),
-          cardTheme: CardTheme(
+          cardTheme: CardThemeData(
             elevation: 2,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             clipBehavior: Clip.antiAlias,
@@ -71,11 +71,25 @@ class AuthNotifier extends ChangeNotifier {
   AuthNotifier(this._auth);
 
   bool get isLoggedIn => _auth.isLoggedIn;
+  bool get biometricEnabled => _auth.biometricEnabled;
+  bool get needsBiometricUnlock => _auth.needsBiometricUnlock;
   String get userDisplayName => _auth.userDisplayName;
   String get userRole => _auth.userRole;
 
   Future<bool> login(String email, String password) async {
     final ok = await _auth.login(email, password);
+    if (ok) notifyListeners();
+    return ok;
+  }
+
+  Future<bool> setBiometricEnabled(bool enabled) async {
+    final ok = await _auth.setBiometricEnabled(enabled);
+    if (ok) notifyListeners();
+    return ok;
+  }
+
+  Future<bool> unlockWithBiometric() async {
+    final ok = await _auth.unlockWithBiometric();
     if (ok) notifyListeners();
     return ok;
   }

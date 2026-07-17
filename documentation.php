@@ -5,6 +5,7 @@
 require_once __DIR__ . '/includes/public_layout.php';
 require_once __DIR__ . '/includes/documentation_sections.php';
 require_once __DIR__ . '/includes/saas/SubscriptionPlan.php';
+require_once __DIR__ . '/includes/saas/PharmaCommercial.php';
 require_once __DIR__ . '/includes/saas/saas_helpers.php';
 
 public_init();
@@ -13,7 +14,10 @@ $plans = SubscriptionPlan::getCommercialPlans();
 $paymentNumber = saas_get_payment_number();
 $year = date('Y');
 
-public_head('Documentation — ' . platform_name(), 'pub-documentation');
+public_head('Documentation — ' . platform_name(), 'pub-documentation', [], [
+    'description' => 'Guide complet du logiciel médical : modules, rôles utilisateurs, workflows, sync paiements-finances. Documentation technique complète.',
+    'keywords' => 'documentation logiciel médical, guide utilisateur clinique, modules patients consultations, workflows hôpital, formation logiciel santé',
+]);
 public_nav('documentation');
 public_hero(
     'Documentation ' . platform_name(),
@@ -317,8 +321,15 @@ public_hero(
                                 est préconfiguré avec un compte administrateur (<code>demo</code>).
                             </p>
                             <a href="<?= public_url('login.php?demo_try=1') ?>" class="pub-btn pub-btn-primary btn">
-                                <i class="fas fa-rocket me-2"></i>Lancer l'essai gratuit
+                                <i class="fas fa-rocket me-2"></i>Lancer l'essai clinique
                             </a>
+                            <a href="<?= htmlspecialchars(PharmaCommercial::demoLoginUrl()) ?>" class="pub-btn pub-btn-outline btn ms-2 mt-2 mt-md-0">
+                                <i class="fas fa-prescription-bottle-medical me-2"></i>Démo PharmaPro ERP
+                            </a>
+                            <p class="small text-muted mt-3 mb-0">
+                                PharmaPro : compte <code>pharmademo</code> / <code>demo123</code> —
+                                <a href="<?= public_url('tarifs_pharma.php') ?>">tarifs officine</a>
+                            </p>
                         </div>
                     </div>
                 </article>

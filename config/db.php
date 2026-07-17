@@ -3,10 +3,14 @@
  * Configuration de la base de données
  */
 
+require_once __DIR__ . '/environment.php';
+
 $dbLocal = __DIR__ . '/db.local.php';
 if (is_file($dbLocal)) {
     require_once $dbLocal;
 }
+
+app_load_environment();
 
 // Inclure la configuration de la devise seulement si pas déjà incluse
 if (!defined('CURRENCY_CODE')) {
@@ -47,6 +51,7 @@ function getDBSoft(): ?PDO
         );
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $pdo->exec('SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci');
         return $pdo;
     } catch (PDOException $e) {
         error_log('Erreur de connexion DB: ' . $e->getMessage());

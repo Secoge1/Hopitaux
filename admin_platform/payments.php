@@ -4,6 +4,8 @@ require_once __DIR__ . '/../includes/app_layout.php';
 require_once __DIR__ . '/../includes/app_platform_layout.php';
 require_once __DIR__ . '/../includes/saas/SubscriptionCheckout.php';
 require_once __DIR__ . '/../includes/saas/SubscriptionPlan.php';
+require_once __DIR__ . '/../includes/saas/PharmaSubscriptionPlan.php';
+require_once __DIR__ . '/../includes/saas/PharmaCommercial.php';
 require_once __DIR__ . '/../includes/saas/saas_helpers.php';
 require_once __DIR__ . '/../includes/app_platform_actions.php';
 require_once __DIR__ . '/_handlers.php';
@@ -79,8 +81,13 @@ app_platform_alert($message, $messageType);
                         <br><small class="text-muted"><i class="fas fa-phone fa-xs"></i> <?= htmlspecialchars($o['phone']) ?></small>
                         <?php endif; ?>
                     </td>
-                    <td><span class="platform-pill"><?= htmlspecialchars($o['order_type']) ?></span></td>
-                    <td><?= htmlspecialchars(SubscriptionPlan::get($o['license_type'])['name']) ?></td>
+                    <td>
+                        <?php if (saas_order_is_pharma($o)): ?>
+                        <span class="platform-pill platform-pill--success">PharmaPro</span>
+                        <?php endif; ?>
+                        <span class="platform-pill platform-pill--muted"><?= htmlspecialchars($o['order_type']) ?></span>
+                    </td>
+                    <td><?= htmlspecialchars(saas_order_plan($o)['name']) ?></td>
                     <td><strong class="text-success"><?= saas_format_amount((int) $o['amount_xof']) ?></strong></td>
                     <td><small><?= date('d/m/Y H:i', strtotime($o['created_at'])) ?></small></td>
                     <td class="platform-col-actions">
@@ -101,7 +108,7 @@ app_platform_alert($message, $messageType);
         <ol class="mb-0 small text-muted ps-3">
             <li>Vérifiez le virement sur <?= htmlspecialchars(saas_get_payment_methods()) ?> — <?= htmlspecialchars(saas_get_payment_number()) ?></li>
             <li>Recoupez la référence commande avec le message du client</li>
-            <li>Cliquez <strong>Confirmer</strong> pour activer ou renouveler la licence automatiquement</li>
+            <li>Cliquez <strong>Confirmer</strong> pour activer ou renouveler la licence automatiquement (PharmaPro ERP activé si commande officine)</li>
         </ol>
     </div>
 </div>
