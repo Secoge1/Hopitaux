@@ -125,7 +125,7 @@ if (!function_exists('pharma_erp_require_role')) {
             require_once __DIR__ . '/../../config/Auth.php';
         }
         $auth = Auth::getInstance();
-        $auth->requireAuth();
+        $auth->requireAuth(app_url('login.php?redirect=' . rawurlencode('pharma_erp/')));
 
         if (!$auth->aUnRole(pharma_erp_allowed_roles())) {
             if (!function_exists('redirectWithMessage')) {

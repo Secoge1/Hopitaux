@@ -20,8 +20,8 @@ if (!function_exists('app_is_pharma_production_host')) {
 
         $host = app_http_host();
         $known = [
-            'pharmasmart.secogesarl.com',
-            'pharma.secogesarl.com', // alias historique
+            'pharma.secogesarl.com',
+            'pharmasmart.secogesarl.com', // alias / ancien nom
         ];
 
         return in_array($host, $known, true);

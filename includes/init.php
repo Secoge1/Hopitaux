@@ -30,7 +30,7 @@ if (
     && empty($_SERVER['HTTPS'])
     && strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) !== 'https'
 ) {
-    $host = $_SERVER['HTTP_HOST'] ?? 'pharmasmart.secogesarl.com';
+    $host = $_SERVER['HTTP_HOST'] ?? 'pharma.secogesarl.com';
     $uri = $_SERVER['REQUEST_URI'] ?? '/';
     header('Location: https://' . $host . $uri, true, 301);
     exit;
@@ -370,47 +370,7 @@ function hasPermission($permission) {
 }
 
 // Fonction pour rediriger avec message
-function redirectWithMessage($url, $message, $type = 'info') {
-    $_SESSION['flash_message'] = $message;
-    $_SESSION['flash_type'] = $type;
-    header("Location: $url");
-    exit;
-}
-
-// Fonction pour afficher les messages flash
-function displayFlashMessages() {
-    if (isset($_SESSION['flash_message'])) {
-        $message = $_SESSION['flash_message'];
-        $type = $_SESSION['flash_type'] ?? 'info';
-        
-        unset($_SESSION['flash_message'], $_SESSION['flash_type']);
-        
-        $alertClass = [
-            'success' => 'alert-success',
-            'error' => 'alert-danger',
-            'warning' => 'alert-warning',
-            'info' => 'alert-info'
-        ];
-        
-        $iconClass = [
-            'success' => 'fa-check-circle',
-            'error' => 'fa-exclamation-circle',
-            'warning' => 'fa-exclamation-triangle',
-            'info' => 'fa-info-circle'
-        ];
-        
-        $class = $alertClass[$type] ?? 'alert-info';
-        $icon = $iconClass[$type] ?? 'fa-info-circle';
-        
-        return "<div class='alert $class alert-dismissible fade show' role='alert'>
-                    <i class='fas $icon me-2'></i>
-                    $message
-                    <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
-                </div>";
-    }
-    
-    return '';
-}
+require_once __DIR__ . '/flash_messages.php';
 
 // Fonction pour formater un montant en FCFA (wrapper)
 function formatFCFAWrapper($amount) {

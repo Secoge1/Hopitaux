@@ -99,7 +99,7 @@ class _PharmaHomeScreenState extends State<PharmaHomeScreen> {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFF0D9488), Color(0xFF0F766E)],
+                      colors: [Color(0xFF1B8FAD), Color(0xFF1B4F9B)],
                     ),
                   ),
                 ),
@@ -128,7 +128,7 @@ class _PharmaHomeScreenState extends State<PharmaHomeScreen> {
                       label: 'CA aujourd\'hui',
                       value: PharmaFormat.money(_num(_stats, 'sales_today')),
                       icon: Icons.payments,
-                      color: const Color(0xFF0D9488),
+                      color: const Color(0xFF1B8FAD),
                     ),
                     _KpiCard(
                       label: 'Transactions',
@@ -245,7 +245,7 @@ class _PharmaHomeScreenState extends State<PharmaHomeScreen> {
                       return ListTile(
                         leading: const CircleAvatar(
                           backgroundColor: Color(0xFFE0F2F1),
-                          child: Icon(Icons.receipt, color: Color(0xFF0D9488)),
+                          child: Icon(Icons.receipt, color: Color(0xFF1B8FAD)),
                         ),
                         title: Text(sale['sale_number']?.toString() ?? 'Vente'),
                         subtitle: Text(sale['completed_at']?.toString() ?? ''),

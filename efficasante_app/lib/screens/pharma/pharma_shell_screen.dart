@@ -14,7 +14,7 @@ class PharmaShellScreen extends StatefulWidget {
 class _PharmaShellScreenState extends State<PharmaShellScreen> {
   int _index = 0;
 
-  static const _accent = Color(0xFF0D9488);
+  static const _accent = Color(0xFF1B8FAD);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class _PharmaShellScreenState extends State<PharmaShellScreen> {
       data: Theme.of(context).copyWith(
         colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: _accent,
-              secondary: const Color(0xFF14B8A6),
+              secondary: const Color(0xFF00B5AD),
             ),
       ),
       child: Scaffold(

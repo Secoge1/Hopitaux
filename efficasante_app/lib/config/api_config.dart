@@ -6,7 +6,7 @@ class ApiConfig {
   static const String productionUrl = 'https://sesante.secogesarl.com';
 
   /// Production PharmaPro ERP (officine autonome)
-  static const String pharmaProductionUrl = 'https://pharmasmart.secogesarl.com';
+  static const String pharmaProductionUrl = 'https://pharma.secogesarl.com';
 
   /// Développement — émulateur Android → localhost du PC (WAMP)
   static const String devAndroidEmulatorUrl = 'http://10.0.2.2/Hopitaux';

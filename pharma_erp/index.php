@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 {
                     label: 'Ventes (FCFA)',
                     data: <?= $trendTotals ?>,
-                    borderColor: '#0ea5e9',
+                    borderColor: '#1b8fad',
                     backgroundColor: 'rgba(14, 165, 233, 0.1)',
                     fill: true,
                     tension: 0.4,
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 {
                     label: 'Bénéfice (FCFA)',
                     data: <?= $trendProfits ?>,
-                    borderColor: '#10b981',
+                    borderColor: '#00b5ad',
                     backgroundColor: 'transparent',
                     tension: 0.4,
                 }

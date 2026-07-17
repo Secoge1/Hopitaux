@@ -1,7 +1,7 @@
 <?php
 /**
  * Exemple — identifiants MySQL production PharmaPro.
- * Copier en config/db.pharma.production.php sur pharmasmart.secogesarl.com
+ * Copier en config/db.pharma.production.php sur pharma.secogesarl.com
  */
 
 if (!defined('DB_HOST')) {

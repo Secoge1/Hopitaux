@@ -1,14 +1,18 @@
 <?php
 /**
- * Profil site — production PharmaPro ERP (pharmasmart.secogesarl.com).
+ * Profil site — production PharmaPro ERP (pharma.secogesarl.com).
  */
 
 if (!defined('APP_PHARMA_HOST')) {
     define('APP_PHARMA_HOST', true);
 }
 
+if (!defined('PHARMA_SITE_URL')) {
+    define('PHARMA_SITE_URL', 'https://pharma.secogesarl.com');
+}
+
 if (!defined('SITE_URL')) {
-    define('SITE_URL', 'https://pharmasmart.secogesarl.com');
+    define('SITE_URL', PHARMA_SITE_URL);
 }
 
 if (!defined('PLATFORM_NAME')) {
@@ -28,7 +32,7 @@ if (!defined('PHARMA_CONTACT_EMAIL')) {
     define('PHARMA_CONTACT_EMAIL', 'contact@secogesarl.com');
 }
 if (!defined('PHARMA_CONTACT_WEBSITE')) {
-    define('PHARMA_CONTACT_WEBSITE', 'https://pharmasmart.secogesarl.com');
+    define('PHARMA_CONTACT_WEBSITE', PHARMA_SITE_URL);
 }
 
 /** Site dédié officine — shell PharmaPro partout (pas le HIS clinique). */

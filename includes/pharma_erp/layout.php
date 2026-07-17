@@ -102,15 +102,13 @@ if (!function_exists('pharma_erp_page_start')) {
     {
         global $auth, $utilisateur;
 
-        $extraCss = array_merge([
-            'assets/css/pharma-erp/pharma-pro.css',
-        ], $opts['extra_css'] ?? []);
+        $extraCss = $opts['extra_css'] ?? [];
 
         $bodyClass = trim('pharma-pro-page ' . ($opts['body_class'] ?? ''));
         pharma_erp_head($opts['title'], $extraCss, $bodyClass);
         ?>
 <link rel="manifest" href="<?= htmlspecialchars(app_url('pharma_erp/manifest.webmanifest')) ?>">
-<meta name="theme-color" content="#059669">
+<meta name="theme-color" content="#1b8fad">
 <meta name="mobile-web-app-capable" content="yes">
         <?php
         $active = $opts['active'] ?? 'dashboard';

@@ -1,15 +1,15 @@
 /* PharmaPro ERP — pages publiques (tarifs, souscription) */
 
 .pub-pharma-page {
-    --pharma-primary: #0d7a4f;
-    --pharma-primary-dark: #065a38;
-    --pharma-accent: #12a86b;
-    --pharma-soft: #e8f7ef;
+    --pharma-primary: var(--pub-primary, #1b8fad);
+    --pharma-primary-dark: var(--pub-primary-dark, #1b4f9b);
+    --pharma-accent: var(--pub-teal, #00b5ad);
+    --pharma-soft: var(--pub-light, #e8f7f9);
     --pharma-gold: #f0b429;
 }
 
 .pub-pharma-hero {
-    background: linear-gradient(135deg, #043d28 0%, var(--pharma-primary) 45%, var(--pharma-accent) 100%);
+    background: linear-gradient(135deg, var(--pub-primary-deep, #154080) 0%, var(--pharma-primary) 45%, var(--pharma-accent) 100%);
     color: #fff;
     padding: 4.5rem 0 3.5rem;
 }
@@ -121,11 +121,11 @@
 
 .pub-pharma-module-card {
     background: #fff;
-    border: 1px solid #dcefe4;
+    border: 1px solid #d6eaf0;
     border-radius: 12px;
     padding: 1rem 0.75rem;
     text-align: center;
-    box-shadow: 0 4px 16px rgba(13, 122, 79, 0.06);
+    box-shadow: 0 4px 16px rgba(27, 143, 173, 0.08);
 }
 
 .pub-pharma-module-card i {
@@ -146,12 +146,12 @@
 }
 
 .pub-pharma-pricing .saas-plan-card {
-    border-color: #cfe8da;
+    border-color: #cce8ef;
 }
 
 .pub-pharma-pricing .saas-plan-popular {
     border-color: var(--pharma-primary);
-    box-shadow: 0 8px 30px rgba(13, 122, 79, 0.18);
+    box-shadow: 0 8px 30px rgba(27, 143, 173, 0.18);
 }
 
 .pub-pharma-pricing .saas-price {
@@ -168,7 +168,7 @@
     border-radius: 14px;
     padding: 1.5rem;
     height: 100%;
-    border: 1px solid #e5efe9;
+    border: 1px solid #e2eef3;
 }
 
 .pub-pharma-trust-card i {
@@ -209,8 +209,8 @@
     background: #fff;
     border-radius: 16px;
     padding: 1.25rem;
-    box-shadow: 0 10px 30px rgba(13, 122, 79, 0.12);
-    border: 1px solid #dcefe4;
+    box-shadow: 0 10px 30px rgba(27, 143, 173, 0.12);
+    border: 1px solid #d6eaf0;
 }
 
 .pub-pharma-qr-label {
